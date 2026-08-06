@@ -66,6 +66,9 @@ public class TableQrService {
         }
     }
 
+    @Autowired
+    private com.cafe.management.repository.OrderRepository orderRepository;
+
     public List<RestaurantTable> getAllTables() {
         return tableRepository.findAll();
     }
@@ -94,6 +97,23 @@ public class TableQrService {
         RestaurantTable table = tableRepository.findById(tableId)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found"));
         table.setStatus(status.toUpperCase());
+        if ("AVAILABLE".equalsIgnoreCase(status)) {
+            table.setCurrentSessionId(null);
+            table.setCurrentTokenSerial(null);
+        }
         return tableRepository.save(table);
+    }
+
+    public RestaurantTable occupyTableWithToken(Long tableId, String sessionId, String customerTokenSerial) {
+        RestaurantTable table = tableRepository.findById(tableId)
+                .orElseThrow(() -> new ResourceNotFoundException("Table not found"));
+        
+        if ("AVAILABLE".equals(table.getStatus()) || (sessionId != null && sessionId.equals(table.getCurrentSessionId())) || (customerTokenSerial != null && customerTokenSerial.equals(table.getCurrentTokenSerial()))) {
+            table.setCurrentSessionId(sessionId);
+            table.setCurrentTokenSerial(customerTokenSerial);
+            table.setStatus("OCCUPIED");
+            return tableRepository.save(table);
+        }
+        return table;
     }
 }

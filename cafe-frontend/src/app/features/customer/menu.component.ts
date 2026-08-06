@@ -19,7 +19,11 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
           <div class="col-md-8">
             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
               <span class="badge bg-warning text-dark font-monospace px-3 py-2 fs-6">
-                <i class="fa-solid fa-qrcode me-1"></i> SCANNED TABLE #{{ tableNumber }}
+                <i class="fa-solid fa-qrcode me-1"></i> TABLE #{{ tableNumber }}
+              </span>
+
+              <span class="badge bg-light text-dark font-monospace px-3 py-2 fs-6 border shadow-sm" *ngIf="customerTokenSerial">
+                <i class="fa-solid fa-ticket text-warning me-1"></i> TOKEN: {{ customerTokenSerial }}
               </span>
 
               <!-- Live Table Occupancy Status Tag -->
@@ -42,9 +46,9 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
             <p class="mb-0 text-white-50">Browse our gourmet creations, customize your order, and send directly to our kitchen.</p>
           </div>
           <div class="col-md-4 text-end">
-            <a [routerLink]="['/customer/tables']" class="btn btn-outline-light rounded-pill px-3 me-2 mb-1">
-              <i class="fa-solid fa-chair me-1"></i> Switch Table
-            </a>
+            <button class="btn btn-outline-light rounded-pill px-3 me-2 mb-1" (click)="openSwitchTableModal()">
+              <i class="fa-solid fa-right-left me-1"></i> Switch Table
+            </button>
             <a *ngIf="activeOrder" [routerLink]="['/customer/tracking', activeOrder.id]" class="btn btn-light rounded-pill px-3 mb-1">
               <i class="fa-solid fa-clock-rotate-left me-1"></i> Track Order #{{ activeOrder.orderNumber }}
             </a>
@@ -368,6 +372,52 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
         </div>
       </div>
     </div>
+
+    <!-- Switch Table Modal Overlay -->
+    <div class="modal-backdrop fade show" *ngIf="showSwitchTableModal" (click)="closeSwitchTableModal()" style="z-index: 1050; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);"></div>
+    <div class="modal d-block fade show" *ngIf="showSwitchTableModal" tabindex="-1" style="z-index: 1055;">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+          <div class="modal-header bg-dark text-white p-4">
+            <h5 class="modal-title font-serif fw-bold d-flex align-items-center gap-2">
+              <i class="fa-solid fa-right-left text-warning"></i> Switch Your Restaurant Table
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeSwitchTableModal()"></button>
+          </div>
+          <div class="modal-body p-4 text-center">
+            <div class="mb-4">
+              <span class="badge bg-warning text-dark font-monospace px-3 py-2 fs-6 mb-2">
+                CUSTOMER TOKEN: {{ customerTokenSerial }}
+              </span>
+              <p class="text-secondary small mb-0">
+                You are currently seated at <strong class="text-dark">Table #{{ tableNumber }}</strong>. Choose an available table below to move your seat. Table #{{ tableNumber }} will be instantly freed for other guests, and waiter will deliver food to your new table!
+              </p>
+            </div>
+
+            <div *ngIf="!availableTablesForSwitch.length" class="p-4 bg-light rounded-4 text-muted">
+              <i class="fa-solid fa-ban fs-3 mb-2 text-secondary"></i>
+              <div>No other free tables available right now.</div>
+            </div>
+
+            <div class="row g-3" *ngIf="availableTablesForSwitch.length">
+              <div class="col-6" *ngFor="let tbl of availableTablesForSwitch">
+                <button class="btn btn-outline-success w-100 p-3 rounded-4 fw-bold d-flex flex-column align-items-center gap-1 shadow-sm"
+                        (click)="confirmSwitchTable(tbl)">
+                  <span class="fs-5 font-monospace text-dark">TABLE #{{ tbl.tableNumber }}</span>
+                  <span class="small text-muted"><i class="fa-solid fa-users text-warning me-1"></i> {{ tbl.capacity }} Seats</span>
+                  <span class="badge bg-success text-white rounded-pill px-2 py-1 small">FREE & AVAILABLE 🌱</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light p-3">
+            <button type="button" class="btn btn-outline-secondary w-100 rounded-pill py-2 fw-bold" (click)="closeSwitchTableModal()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   `
 })
 export class MenuComponent implements OnInit {
@@ -387,6 +437,11 @@ export class MenuComponent implements OnInit {
   activeOrder: Order | null = null;
   tableStatus = 'AVAILABLE';
   isTableOccupiedByOther = false;
+  customerTokenSerial = '';
+
+  // Switch Table Modal State
+  showSwitchTableModal = false;
+  availableTablesForSwitch: RestaurantTable[] = [];
 
   // Detail Modal State
   selectedItem: MenuItem | null = null;
@@ -409,12 +464,17 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      if (!params['table']) {
+      let tNum = params['table'];
+      if (!tNum) {
+        tNum = sessionStorage.getItem('current_table_number');
+      }
+      if (!tNum) {
         this.toastService.show('Please scan a Table QR Code or select an available table first!', 'info');
         this.router.navigate(['/customer/tables']);
         return;
       }
-      this.tableNumber = parseInt(params['table']);
+      this.tableNumber = parseInt(tNum);
+      sessionStorage.setItem('current_table_number', this.tableNumber.toString());
       this.initSession();
     });
   }
@@ -426,6 +486,13 @@ export class MenuComponent implements OnInit {
       sessionStorage.setItem('cafe_session', session);
     }
     this.sessionId = session;
+
+    let token = sessionStorage.getItem('customer_token_serial');
+    if (!token) {
+      token = 'TKN-' + Math.floor(1000 + Math.random() * 9000);
+      sessionStorage.setItem('customer_token_serial', token);
+    }
+    this.customerTokenSerial = token;
 
     // Load menu items & categories immediately
     this.loadCategories();
@@ -439,21 +506,20 @@ export class MenuComponent implements OnInit {
 
         // Auto-occupy table for guest when scanning QR code via Google Lens if AVAILABLE
         if (tbl.status === 'AVAILABLE') {
-          sessionStorage.setItem('my_occupied_table', tbl.tableNumber.toString());
-          this.customerService.occupyTable(tbl.id).subscribe({
+          this.customerService.occupyTable(tbl.id, this.sessionId, this.customerTokenSerial).subscribe({
             next: (updatedTbl) => {
               this.tableStatus = updatedTbl.status;
               this.loadCart();
-              this.checkActiveOrder();
+              this.checkActiveOrder(updatedTbl);
             },
             error: () => {
               this.loadCart();
-              this.checkActiveOrder();
+              this.checkActiveOrder(tbl);
             }
           });
         } else {
           this.loadCart();
-          this.checkActiveOrder();
+          this.checkActiveOrder(tbl);
         }
       },
       error: () => {
@@ -477,13 +543,16 @@ export class MenuComponent implements OnInit {
     this.customerService.getCart(this.sessionId, this.tableId).subscribe(res => this.cart = res);
   }
 
-  checkActiveOrder(): void {
-    const myOccupiedTable = sessionStorage.getItem('my_occupied_table');
-    const isMyTable = myOccupiedTable === this.tableNumber.toString();
+  checkActiveOrder(currentTable?: RestaurantTable): void {
+    // Check if current guest owns this table's session or token link
+    const isMySessionOrToken = currentTable && (
+      currentTable.currentSessionId === this.sessionId ||
+      currentTable.currentTokenSerial === this.customerTokenSerial
+    );
 
     this.customerService.getActiveOrderByTable(this.tableId).subscribe({
       next: (order) => {
-        if (order && (order.sessionId === this.sessionId || isMyTable)) {
+        if (order && (order.sessionId === this.sessionId || order.customerTokenSerial === this.customerTokenSerial)) {
           // Current guest owns this active order!
           this.activeOrder = order;
           this.isTableOccupiedByOther = false;
@@ -491,9 +560,9 @@ export class MenuComponent implements OnInit {
           // Active order belongs to another guest!
           this.activeOrder = null;
           this.isTableOccupiedByOther = true;
-        } else if ((this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') && !isMyTable) {
+        } else if (this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') {
           this.activeOrder = null;
-          this.isTableOccupiedByOther = true;
+          this.isTableOccupiedByOther = !isMySessionOrToken;
         } else {
           this.activeOrder = null;
           this.isTableOccupiedByOther = false;
@@ -501,8 +570,8 @@ export class MenuComponent implements OnInit {
       },
       error: () => {
         this.activeOrder = null;
-        if ((this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') && !isMyTable) {
-          this.isTableOccupiedByOther = true;
+        if (this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') {
+          this.isTableOccupiedByOther = !isMySessionOrToken;
         } else {
           this.isTableOccupiedByOther = false;
         }
@@ -665,6 +734,7 @@ export class MenuComponent implements OnInit {
       sessionId: this.sessionId,
       tableId: this.tableId,
       customerName: this.customerName || `Table ${this.tableNumber} Guest`,
+      customerTokenSerial: this.customerTokenSerial,
       items: this.cart.items.map(ci => ({
         menuItemId: ci.menuItem.id,
         quantity: ci.quantity,
@@ -677,9 +747,59 @@ export class MenuComponent implements OnInit {
         this.activeOrder = order;
         this.showCart = false;
         this.loadCart();
-        this.toastService.show(`Order #${order.orderNumber} sent to kitchen!`, 'success');
+        this.toastService.show(`Order #${order.orderNumber} sent to kitchen! (Token: ${this.customerTokenSerial})`, 'success');
       },
       error: (err) => this.toastService.show(err.error?.message || 'Error placing order', 'error')
+    });
+  }
+
+  openSwitchTableModal(): void {
+    this.customerService.getTables().subscribe(tables => {
+      this.availableTablesForSwitch = tables.filter(t => t.status === 'AVAILABLE' && t.tableNumber !== this.tableNumber);
+      this.showSwitchTableModal = true;
+    });
+  }
+
+  closeSwitchTableModal(): void {
+    this.showSwitchTableModal = false;
+  }
+
+  confirmSwitchTable(targetTable: RestaurantTable): void {
+    const oldTableNum = this.tableNumber;
+    this.customerService.switchTable(this.sessionId, this.tableId, targetTable.id, this.customerTokenSerial).subscribe({
+      next: (updatedOrder) => {
+        this.closeSwitchTableModal();
+        this.tableNumber = targetTable.tableNumber;
+        this.tableId = targetTable.id;
+        sessionStorage.setItem('current_table_number', targetTable.tableNumber.toString());
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { table: targetTable.tableNumber },
+          queryParamsHandling: 'merge'
+        });
+
+        if (updatedOrder) {
+          this.activeOrder = updatedOrder;
+        }
+        this.toastService.show(`Switched from Table #${oldTableNum} to Table #${targetTable.tableNumber}! (Token: ${this.customerTokenSerial}). Waiter will serve food to Table #${targetTable.tableNumber}.`, 'success');
+        this.initSession();
+      },
+      error: () => {
+        this.closeSwitchTableModal();
+        this.tableNumber = targetTable.tableNumber;
+        this.tableId = targetTable.id;
+        sessionStorage.setItem('current_table_number', targetTable.tableNumber.toString());
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { table: targetTable.tableNumber },
+          queryParamsHandling: 'merge'
+        });
+
+        this.toastService.show(`Switched to Table #${targetTable.tableNumber}! (Token: ${this.customerTokenSerial})`, 'success');
+        this.initSession();
+      }
     });
   }
 

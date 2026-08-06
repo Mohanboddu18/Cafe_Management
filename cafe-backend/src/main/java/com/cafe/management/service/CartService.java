@@ -85,4 +85,14 @@ public class CartService {
     public void clearCart(String sessionId) {
         cartRepository.findBySessionId(sessionId).ifPresent(cartRepository::delete);
     }
+
+    @Transactional
+    public void transferCartTable(String sessionId, Long fromTableId, Long toTableId) {
+        cartRepository.findBySessionId(sessionId).ifPresent(cart -> {
+            tableRepository.findById(toTableId).ifPresent(toTable -> {
+                cart.setTable(toTable);
+                cartRepository.save(cart);
+            });
+        });
+    }
 }

@@ -34,4 +34,20 @@ export class WaiterService {
   getNotifications(): Observable<NotificationMsg[]> {
     return this.http.get<NotificationMsg[]>(`${this.apiUrl}/notifications`);
   }
+
+  confirmCashPayment(orderId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/orders/confirm-cash/${orderId}`, {});
+  }
+
+  downloadInvoicePdf(orderId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/orders/invoice/${orderId}/pdf`, { responseType: 'blob' }) as Observable<Blob>;
+  }
+
+  dismissNotification(id: number): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/notifications/${id}/read`, {});
+  }
+
+  clearAllNotifications(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/notifications/clear-all`);
+  }
 }

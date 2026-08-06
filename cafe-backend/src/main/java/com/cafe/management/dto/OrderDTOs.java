@@ -27,8 +27,19 @@ public class OrderDTOs {
         private Long tableId;
         private String customerName;
         private String customerPhone;
+        private String customerTokenSerial;
         private String notes;
         private List<CartItemRequest> items;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SwitchTableRequest {
+        private String sessionId;
+        private Long fromTableId;
+        private Long toTableId;
+        private String customerTokenSerial;
     }
 
     @Data
@@ -50,6 +61,7 @@ public class OrderDTOs {
         private Long tableId;
         private Integer tableNumber;
         private String customerName;
+        private String customerTokenSerial;
         private String sessionId;
         private BigDecimal totalAmount;
         private BigDecimal discountAmount;

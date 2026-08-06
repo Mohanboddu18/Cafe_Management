@@ -1,5 +1,6 @@
 package com.cafe.management.controller;
 
+import com.cafe.management.dto.BillingDTOs.*;
 import com.cafe.management.dto.OrderDTOs.*;
 import com.cafe.management.entity.*;
 import com.cafe.management.service.*;
@@ -30,6 +31,9 @@ public class CustomerController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private BillingInvoiceService billingInvoiceService;
 
     @GetMapping("/tables")
     public ResponseEntity<List<RestaurantTable>> getAllTables() {
@@ -102,13 +106,40 @@ public class CustomerController {
     }
 
     @PostMapping("/table/{tableId}/occupy")
-    public ResponseEntity<RestaurantTable> occupyTable(@PathVariable Long tableId) {
-        return ResponseEntity.ok(tableQrService.updateTableStatus(tableId, "OCCUPIED"));
+    public ResponseEntity<RestaurantTable> occupyTable(
+            @PathVariable Long tableId,
+            @RequestParam(required = false) String sessionId,
+            @RequestParam(required = false) String customerTokenSerial) {
+        return ResponseEntity.ok(tableQrService.occupyTableWithToken(tableId, sessionId, customerTokenSerial));
+    }
+
+    @PostMapping("/table/switch")
+    public ResponseEntity<OrderResponse> switchTable(@RequestBody SwitchTableRequest request) {
+        return ResponseEntity.ok(orderService.switchTable(request));
+    }
+
+    @GetMapping("/invoice/order/{orderId}")
+    public ResponseEntity<InvoiceResponse> getInvoiceForCustomer(@PathVariable Long orderId) {
+        return ResponseEntity.ok(billingInvoiceService.getInvoiceByOrderId(orderId));
+    }
+
+    @PostMapping("/invoice/pay")
+    public ResponseEntity<InvoiceResponse> customerPayInvoice(@RequestBody CustomerPaymentRequest request) {
+        return ResponseEntity.ok(billingInvoiceService.customerPayInvoice(request));
     }
 
     @PostMapping("/table/{tableId}/request-bill")
     public ResponseEntity<Void> requestBill(@PathVariable Long tableId) {
         orderService.requestBillForTable(tableId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/invoice/order/{orderId}/pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable Long orderId) {
+        byte[] pdfBytes = billingInvoiceService.generateInvoicePdfBytes(orderId);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Invoice_Order_" + orderId + ".pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
 }

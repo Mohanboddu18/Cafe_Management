@@ -23,6 +23,7 @@ public class Invoice {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = false, unique = true)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Order order;
 
     @Column(nullable = false, precision = 10, scale = 2)
@@ -42,6 +43,9 @@ public class Invoice {
 
     @Column(name = "pdf_url", length = 500)
     private String pdfUrl;
+
+    @Column(name = "payment_status", length = 30)
+    private String paymentStatus = "PENDING";
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

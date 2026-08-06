@@ -50,6 +50,16 @@ public class CashierController {
         return ResponseEntity.ok(billingInvoiceService.getInvoiceByOrderId(orderId));
     }
 
+    @PostMapping("/invoice/generate")
+    public ResponseEntity<InvoiceResponse> generateBillForCustomer(@RequestBody GenerateInvoiceRequest request) {
+        return ResponseEntity.ok(billingInvoiceService.generateBillForCustomer(request));
+    }
+
+    @PostMapping("/invoice/confirm-cash/{orderId}")
+    public ResponseEntity<InvoiceResponse> confirmCashPayment(@PathVariable Long orderId) {
+        return ResponseEntity.ok(billingInvoiceService.confirmCashPayment(orderId));
+    }
+
     @GetMapping(value = "/invoice/order/{orderId}/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable Long orderId) {
         byte[] pdfBytes = billingInvoiceService.generateInvoicePdfBytes(orderId);

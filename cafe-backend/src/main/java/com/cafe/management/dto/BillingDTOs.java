@@ -33,6 +33,24 @@ public class BillingDTOs {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class GenerateInvoiceRequest {
+        private Long orderId;
+        private String couponCode;
+        private BigDecimal gstPercentage = BigDecimal.valueOf(5.0);
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CustomerPaymentRequest {
+        private Long orderId;
+        private String paymentMethod; // UPI, CARD, CASH
+        private String transactionRef;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProcessPaymentRequest {
         private Long orderId;
         private String couponCode;

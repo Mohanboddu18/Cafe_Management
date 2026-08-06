@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CustomerService } from '../../core/services/customer.service';
 import { RestaurantTable } from '../../core/models/cafe.models';
 import { ToastService } from '../../core/services/toast.service';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-table-selection',
@@ -64,6 +65,12 @@ import { ToastService } from '../../core/services/toast.service';
                        'fa-file-invoice': tbl.status === 'BILL_REQUESTED'
                      }"></i>
                   {{ tbl.status === 'AVAILABLE' ? 'AVAILABLE 🌱' : (tbl.status === 'OCCUPIED' ? 'OCCUPIED 🔴' : 'BILL REQUESTED ⚠️') }}
+                </span>
+              </div>
+
+              <div *ngIf="tbl.status === 'OCCUPIED' && tbl.currentTokenSerial" class="mb-2">
+                <span class="badge bg-danger-subtle text-danger border border-danger font-monospace px-3 py-1 rounded-pill small">
+                  <i class="fa-solid fa-ticket me-1"></i> LINKED: {{ tbl.currentTokenSerial }}
                 </span>
               </div>
 
@@ -141,9 +148,10 @@ import { ToastService } from '../../core/services/toast.service';
     .transition-all { transition: all 0.3s ease; }
   `]
 })
-export class TableSelectionComponent implements OnInit {
+export class TableSelectionComponent implements OnInit, OnDestroy {
   tables: RestaurantTable[] = [];
   warningTable: RestaurantTable | null = null;
+  private pollSub?: Subscription;
 
   constructor(
     private customerService: CustomerService,
@@ -153,6 +161,11 @@ export class TableSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTables();
+    this.pollSub = interval(3000).subscribe(() => this.loadTables());
+  }
+
+  ngOnDestroy(): void {
+    this.pollSub?.unsubscribe();
   }
 
   loadTables(): void {
@@ -172,17 +185,8 @@ export class TableSelectionComponent implements OnInit {
       this.showOccupiedWarning(table);
       return;
     }
-    sessionStorage.setItem('my_occupied_table', table.tableNumber.toString());
-    this.customerService.occupyTable(table.id).subscribe({
-      next: () => {
-        this.toastService.show(`Opening Digital Menu for Table #${table.tableNumber}...`, 'success');
-        this.router.navigate(['/customer/menu'], { queryParams: { table: table.tableNumber } });
-      },
-      error: () => {
-        this.toastService.show(`Opening Digital Menu for Table #${table.tableNumber}...`, 'success');
-        this.router.navigate(['/customer/menu'], { queryParams: { table: table.tableNumber } });
-      }
-    });
+    this.toastService.show(`Opening Digital Menu for Table #${table.tableNumber}...`, 'success');
+    this.router.navigate(['/customer/menu'], { queryParams: { table: table.tableNumber } });
   }
 
   showOccupiedWarning(table: RestaurantTable): void {

@@ -6,6 +6,7 @@ com\cafe\management\entity\MenuItem.class
 com\cafe\management\service\AuthService.class
 com\cafe\management\service\CartService.class
 com\cafe\management\entity\Cart.class
+com\cafe\management\dto\BillingDTOs$GenerateInvoiceRequest.class
 com\cafe\management\repository\RestaurantTableRepository.class
 com\cafe\management\config\SecurityConfig.class
 com\cafe\management\exception\BadRequestException.class
@@ -22,6 +23,7 @@ com\cafe\management\entity\Inventory.class
 com\cafe\management\entity\Order$OrderBuilder.class
 com\cafe\management\repository\KitchenOrderRepository.class
 com\cafe\management\dto\AuthDTOs$JwtResponse$JwtResponseBuilder.class
+com\cafe\management\config\DataInitializer.class
 com\cafe\management\dto\BillingDTOs$InvoiceResponse$InvoiceResponseBuilder.class
 com\cafe\management\config\CorsConfig.class
 com\cafe\management\dto\AuthDTOs$SignupRequest.class
@@ -34,6 +36,7 @@ com\cafe\management\dto\AuthDTOs$LoginRequest.class
 com\cafe\management\exception\GlobalExceptionHandler.class
 com\cafe\management\controller\AdminController.class
 com\cafe\management\repository\RoleRepository.class
+com\cafe\management\dto\BillingDTOs$CustomerPaymentRequest.class
 com\cafe\management\service\ReportAnalyticsService.class
 com\cafe\management\dto\BillingDTOs.class
 com\cafe\management\entity\Invoice.class
@@ -55,6 +58,7 @@ com\cafe\management\service\TableQrService.class
 com\cafe\management\repository\InvoiceRepository.class
 com\cafe\management\dto\OrderDTOs$OrderItemResponse.class
 com\cafe\management\entity\KitchenOrder$KitchenOrderBuilder.class
+com\cafe\management\dto\OrderDTOs$SwitchTableRequest.class
 com\cafe\management\entity\RestaurantTable.class
 com\cafe\management\controller\CashierController.class
 com\cafe\management\dto\AnalyticsDTOs$RecentOrderSummary.class

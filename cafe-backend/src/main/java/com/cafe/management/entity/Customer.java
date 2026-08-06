@@ -26,6 +26,9 @@ public class Customer {
     @Column(length = 20)
     private String phone;
 
+    @Column(name = "customer_token_serial", length = 50)
+    private String customerTokenSerial;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "table_id", nullable = false)
     private RestaurantTable table;

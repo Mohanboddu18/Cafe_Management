@@ -28,8 +28,8 @@ import { User } from '../../core/models/cafe.models';
               </a>
             </li>
 
-            <!-- Staff Links -->
-            <ng-container *ngIf="user">
+            <!-- Staff Links (Only visible on Staff Dashboards, NOT Customer Pages) -->
+            <ng-container *ngIf="user && !isCustomerPage">
               <li class="nav-item" *ngIf="user.role === 'ROLE_KITCHEN' || user.role === 'ROLE_ADMIN'">
                 <a class="nav-link text-white-50" routerLink="/kitchen/dashboard" routerLinkActive="text-white fw-bold">
                   <i class="fa-solid fa-fire-burner me-1"></i> Kitchen Board
@@ -54,7 +54,8 @@ import { User } from '../../core/models/cafe.models';
           </ul>
 
           <div class="d-flex align-items-center gap-3">
-            <ng-container *ngIf="user; else loginBtn">
+            <!-- Staff User Profile / Logout (Only on Staff Dashboards) -->
+            <ng-container *ngIf="user && !isCustomerPage; else loginBtn">
               <div class="text-end text-white">
                 <div class="fw-bold fs-6">{{ user.fullName }}</div>
                 <span class="badge bg-warning text-dark me-2">{{ getRoleBadgeLabel(user.role) }}</span>
@@ -77,8 +78,12 @@ import { User } from '../../core/models/cafe.models';
 export class NavbarComponent {
   user: User | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, public router: Router) {
     this.authService.currentUser$.subscribe(u => this.user = u);
+  }
+
+  get isCustomerPage(): boolean {
+    return this.router.url.startsWith('/customer') || this.router.url === '/';
   }
 
   logout(): void {

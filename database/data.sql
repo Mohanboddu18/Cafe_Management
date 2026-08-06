@@ -3,7 +3,6 @@
 -- =========================================================
 
 USE `cafe_management_db`;
-
 -- 1. SEED ROLES
 INSERT INTO `roles` (`id`, `name`, `description`) VALUES
 (1, 'ROLE_ADMIN', 'System Administrator with full access'),
@@ -80,8 +79,5 @@ INSERT INTO `inventory` (`id`, `item_name`, `unit`, `current_stock`, `min_requir
 (8, 'French Butter Croissant', 'PCS', 20.00, 5.00, 1.50)
 ON DUPLICATE KEY UPDATE `item_name`=`item_name`;
 
--- 8. SEED NOTIFICATIONS
-INSERT INTO `notifications` (`id`, `target_role`, `title`, `message`, `is_read`) VALUES
-(1, 'ADMIN', 'System Setup Complete', 'Cafe Management System successfully initialized.', FALSE),
-(2, 'KITCHEN', 'Shift Started', 'Kitchen dashboard ready for incoming orders.', FALSE)
-ON DUPLICATE KEY UPDATE `title`=`title`;
+-- 8. SEED NOTIFICATIONS (NONE - ALL NOTIFICATIONS GENERATED DYNAMICALLY FROM MYSQL)
+

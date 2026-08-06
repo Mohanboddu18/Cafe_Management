@@ -38,6 +38,8 @@ export interface RestaurantTable {
   status: 'AVAILABLE' | 'OCCUPIED' | 'BILL_REQUESTED' | 'RESERVED';
   qrCodeUrl: string;
   qrToken: string;
+  currentTokenSerial?: string;
+  currentSessionId?: string;
 }
 
 export interface CartItem {
@@ -72,12 +74,13 @@ export interface Order {
   tableId: number;
   tableNumber: number;
   customerName: string;
+  customerTokenSerial?: string;
   sessionId?: string;
   totalAmount: number;
   discountAmount: number;
   taxAmount: number;
   netAmount: number;
-  status: 'NEW' | 'ACCEPTED' | 'PREPARING' | 'READY' | 'SERVED' | 'COMPLETED' | 'PAID' | 'CANCELLED';
+  status: 'NEW' | 'ACCEPTED' | 'PREPARING' | 'READY' | 'SERVED' | 'BILL_REQUESTED' | 'COMPLETED' | 'PAID' | 'CANCELLED';
   notes?: string;
   orderTime: string;
   items: OrderItem[];

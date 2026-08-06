@@ -37,7 +37,7 @@ public class NotificationService {
     }
 
     public List<Notification> getNotificationsForRole(String targetRole) {
-        return notificationRepository.findByTargetRoleOrderByCreatedAtDesc(targetRole.toUpperCase());
+        return notificationRepository.findByTargetRoleAndIsReadFalseOrderByCreatedAtDesc(targetRole.toUpperCase());
     }
 
     public void markAsRead(Long id) {
@@ -45,5 +45,27 @@ public class NotificationService {
             n.setIsRead(true);
             notificationRepository.save(n);
         });
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void markAllAsReadForRole(String targetRole) {
+        notificationRepository.markAllAsReadForRole(targetRole.toUpperCase());
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteAllNotificationsForRole(String targetRole) {
+        notificationRepository.deleteByTargetRole(targetRole.toUpperCase());
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void markNotificationsForOrderAsRead(Long orderId, String targetRole) {
+        if (orderId == null) return;
+        List<Notification> notifs = notificationRepository.findByTargetRoleAndIsReadFalseOrderByCreatedAtDesc(targetRole.toUpperCase());
+        for (Notification n : notifs) {
+            if (orderId.equals(n.getOrderId())) {
+                n.setIsRead(true);
+            }
+        }
+        notificationRepository.saveAll(notifs);
     }
 }

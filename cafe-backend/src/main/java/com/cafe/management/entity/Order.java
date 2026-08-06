@@ -29,6 +29,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.SET_NULL)
     private Customer customer;
 
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)

@@ -126,29 +126,17 @@ import { RestaurantTable, Order, Invoice } from '../../core/models/cafe.models';
               </div>
             </div>
 
-            <!-- Payment Method & Checkout -->
-            <div class="mb-4">
-              <label class="form-label fw-bold">Payment Method</label>
-              <div class="d-flex gap-3">
-                <div class="form-check flex-grow-1 p-3 border rounded-3 text-center" [ngClass]="{ 'bg-warning-subtle border-warning': paymentMethod === 'CASH' }">
-                  <input class="form-check-input" type="radio" name="payMethod" id="cash" value="CASH" [(ngModel)]="paymentMethod">
-                  <label class="form-check-label fw-bold d-block" for="cash"><i class="fa-solid fa-money-bill-wave me-1"></i> CASH</label>
-                </div>
-                <div class="form-check flex-grow-1 p-3 border rounded-3 text-center" [ngClass]="{ 'bg-warning-subtle border-warning': paymentMethod === 'CARD' }">
-                  <input class="form-check-input" type="radio" name="payMethod" id="card" value="CARD" [(ngModel)]="paymentMethod">
-                  <label class="form-check-label fw-bold d-block" for="card"><i class="fa-regular fa-credit-card me-1"></i> CARD</label>
-                </div>
-                <div class="form-check flex-grow-1 p-3 border rounded-3 text-center" [ngClass]="{ 'bg-warning-subtle border-warning': paymentMethod === 'UPI' }">
-                  <input class="form-check-input" type="radio" name="payMethod" id="upi" value="UPI" [(ngModel)]="paymentMethod">
-                  <label class="form-check-label fw-bold d-block" for="upi"><i class="fa-solid fa-qrcode me-1"></i> UPI / QR</label>
-                </div>
-              </div>
+            <!-- Bill Generation Action for Cashier -->
+            <div class="p-3 bg-light rounded-4 mb-4 border border-warning text-center">
+              <p class="small text-muted mb-2"><i class="fa-solid fa-circle-info text-warning me-1"></i> Cashiers calculate discounts & GST, then generate and send the bill invoice directly to the Customer page for payment.</p>
+              <button class="btn btn-warning text-dark w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm mb-2" (click)="sendBillToCustomer()" [disabled]="processing">
+                <span *ngIf="processing" class="spinner-border spinner-border-sm me-2"></span>
+                <i class="fa-solid fa-paper-plane me-2"></i> Generate & Send Bill Invoice to Customer Page
+              </button>
+              <button class="btn btn-outline-dark btn-sm rounded-pill font-monospace" (click)="processPayment()" [disabled]="processing">
+                <i class="fa-solid fa-print me-1"></i> Preview & Download Thermal PDF
+              </button>
             </div>
-
-            <button class="btn btn-cafe w-100 py-3 rounded-pill fw-bold fs-5" (click)="processPayment()" [disabled]="processing">
-              <span *ngIf="processing" class="spinner-border spinner-border-sm me-2"></span>
-              <i class="fa-solid fa-print me-2"></i> Process Payment & Print Invoice PDF
-            </button>
           </div>
         </div>
       </div>
@@ -252,6 +240,17 @@ export class CashierBillingComponent implements OnInit {
         this.processing = false;
         this.toastService.show('Payment processing error', 'error');
       }
+    });
+  }
+
+  sendBillToCustomer(): void {
+    if (!this.selectedOrder) return;
+    this.cashierService.generateBillForCustomer(this.selectedOrder.id, this.couponCode, 5.0).subscribe({
+      next: (inv) => {
+        this.toastService.show(`Bill Invoice #${inv.invoiceNumber} generated & sent to Customer at Table #${this.selectedOrder?.tableNumber}!`, 'success');
+        this.loadTables();
+      },
+      error: () => this.toastService.show('Error generating bill invoice for customer', 'error')
     });
   }
 }

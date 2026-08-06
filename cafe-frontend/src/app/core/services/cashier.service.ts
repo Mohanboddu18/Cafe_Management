@@ -30,4 +30,12 @@ export class CashierService {
   downloadInvoicePdf(orderId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/invoice/order/${orderId}/pdf`, { responseType: 'blob' }) as Observable<Blob>;
   }
+
+  generateBillForCustomer(orderId: number, couponCode?: string, gstPercentage: number = 5.0): Observable<Invoice> {
+    return this.http.post<Invoice>(`${this.apiUrl}/invoice/generate`, { orderId, couponCode, gstPercentage });
+  }
+
+  confirmCashPayment(orderId: number): Observable<Invoice> {
+    return this.http.post<Invoice>(`${this.apiUrl}/invoice/confirm-cash/${orderId}`, {});
+  }
 }

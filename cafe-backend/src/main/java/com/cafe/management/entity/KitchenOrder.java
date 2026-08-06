@@ -19,6 +19,7 @@ public class KitchenOrder {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = false, unique = true)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Order order;
 
     @Column(name = "kitchen_status", length = 30)

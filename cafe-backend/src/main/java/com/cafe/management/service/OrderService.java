@@ -50,6 +50,7 @@ public class OrderService {
                 .sessionId(request.getSessionId())
                 .name(request.getCustomerName() != null ? request.getCustomerName() : "Table " + table.getTableNumber() + " Customer")
                 .phone(request.getCustomerPhone())
+                .customerTokenSerial(request.getCustomerTokenSerial())
                 .table(table)
                 .build();
         Customer savedCustomer = customerRepository.save(customer);
@@ -217,6 +218,73 @@ public class OrderService {
         );
     }
 
+    @Transactional
+    public OrderResponse switchTable(SwitchTableRequest request) {
+        RestaurantTable fromTable = tableRepository.findById(request.getFromTableId())
+                .orElseThrow(() -> new ResourceNotFoundException("Origin table not found"));
+        RestaurantTable toTable = tableRepository.findById(request.getToTableId())
+                .orElseThrow(() -> new ResourceNotFoundException("Destination table not found"));
+
+        if ("OCCUPIED".equals(toTable.getStatus()) || "BILL_REQUESTED".equals(toTable.getStatus())) {
+            throw new BadRequestException("Destination Table #" + toTable.getTableNumber() + " is currently occupied!");
+        }
+
+        // 1. Mark Destination Table as OCCUPIED and link Token & Session
+        toTable.setStatus("OCCUPIED");
+        toTable.setCurrentSessionId(request.getSessionId());
+        toTable.setCurrentTokenSerial(request.getCustomerTokenSerial());
+        tableRepository.save(toTable);
+
+        // 2. Remove Token Link from Origin Table and reset to AVAILABLE
+        fromTable.setStatus("AVAILABLE");
+        fromTable.setCurrentSessionId(null);
+        fromTable.setCurrentTokenSerial(null);
+        tableRepository.save(fromTable);
+
+        // 3. Transfer Cart Table
+        cartService.transferCartTable(request.getSessionId(), request.getFromTableId(), toTable.getId());
+
+        // 4. Update Active Orders to New Table
+        List<Order> activeOrders = orderRepository.findActiveOrdersByTableId(request.getFromTableId());
+        Order mainOrder = null;
+        for (Order order : activeOrders) {
+            order.setTable(toTable);
+            if (order.getCustomer() != null) {
+                if (request.getCustomerTokenSerial() != null) {
+                    order.getCustomer().setCustomerTokenSerial(request.getCustomerTokenSerial());
+                }
+                order.getCustomer().setTable(toTable);
+                customerRepository.save(order.getCustomer());
+            }
+            String noteMsg = "[TABLE SWITCHED]: Moved from Table #" + fromTable.getTableNumber() +
+                    " ➡️ Table #" + toTable.getTableNumber() + " (Token: " + request.getCustomerTokenSerial() + ")";
+            order.setNotes(order.getNotes() != null ? order.getNotes() + " | " + noteMsg : noteMsg);
+            orderRepository.save(order);
+            mainOrder = order;
+        }
+
+        // 5. Send Live Notification to Waiter & Kitchen
+        String alertMsg = "Customer Token [" + (request.getCustomerTokenSerial() != null ? request.getCustomerTokenSerial() : "GUEST") +
+                "] SWITCHED from Table #" + fromTable.getTableNumber() + " ➡️ Table #" + toTable.getTableNumber() + "! Serve food to Table #" + toTable.getTableNumber() + ".";
+
+        notificationService.sendNotification(
+                "WAITER",
+                "🔄 Table Switch Alert!",
+                alertMsg,
+                mainOrder != null ? mainOrder.getId() : null,
+                toTable.getId()
+        );
+        notificationService.sendNotification(
+                "KITCHEN",
+                "🔄 Table Switch Alert!",
+                alertMsg,
+                mainOrder != null ? mainOrder.getId() : null,
+                toTable.getId()
+        );
+
+        return mainOrder != null ? mapToOrderResponse(mainOrder) : null;
+    }
+
     public OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> itemResponses = order.getItems().stream().map(item ->
                 OrderItemResponse.builder()
@@ -238,6 +306,7 @@ public class OrderService {
                 .tableId(order.getTable().getId())
                 .tableNumber(order.getTable().getTableNumber())
                 .customerName(order.getCustomer() != null ? order.getCustomer().getName() : "Guest")
+                .customerTokenSerial(order.getCustomer() != null ? order.getCustomer().getCustomerTokenSerial() : null)
                 .sessionId(order.getCustomer() != null ? order.getCustomer().getSessionId() : null)
                 .totalAmount(order.getTotalAmount())
                 .discountAmount(order.getDiscountAmount())

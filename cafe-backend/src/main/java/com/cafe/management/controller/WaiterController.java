@@ -28,6 +28,9 @@ public class WaiterController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private com.cafe.management.service.BillingInvoiceService billingInvoiceService;
+
     @GetMapping("/tables")
     public ResponseEntity<List<RestaurantTable>> getAllTables() {
         return ResponseEntity.ok(tableQrService.getAllTables());
@@ -45,7 +48,16 @@ public class WaiterController {
 
     @PutMapping("/orders/{orderId}/mark-served")
     public ResponseEntity<OrderResponse> markServed(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.updateOrderStatus(orderId, "SERVED", null));
+        OrderResponse res = orderService.updateOrderStatus(orderId, "SERVED", null);
+        notificationService.markNotificationsForOrderAsRead(orderId, "WAITER");
+        return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("/orders/confirm-cash/{orderId}")
+    public ResponseEntity<com.cafe.management.dto.BillingDTOs.InvoiceResponse> confirmCashPayment(@PathVariable Long orderId) {
+        com.cafe.management.dto.BillingDTOs.InvoiceResponse res = billingInvoiceService.confirmCashPayment(orderId);
+        notificationService.markNotificationsForOrderAsRead(orderId, "WAITER");
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/orders/walk-in")
@@ -56,5 +68,32 @@ public class WaiterController {
     @GetMapping("/notifications")
     public ResponseEntity<List<Notification>> getNotifications() {
         return ResponseEntity.ok(notificationService.getNotificationsForRole("WAITER"));
+    }
+
+    @PutMapping("/notifications/{id}/read")
+    public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long id) {
+        notificationService.markAsRead(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/notifications/read-all")
+    public ResponseEntity<Void> markAllNotificationsAsRead() {
+        notificationService.markAllAsReadForRole("WAITER");
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/notifications/clear-all")
+    public ResponseEntity<Void> clearAllNotifications() {
+        notificationService.deleteAllNotificationsForRole("WAITER");
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/orders/invoice/{orderId}/pdf", produces = org.springframework.http.MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadInvoicePdf(@PathVariable Long orderId) {
+        byte[] pdfBytes = billingInvoiceService.generateInvoicePdfBytes(orderId);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Invoice_Order_" + orderId + ".pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
 }

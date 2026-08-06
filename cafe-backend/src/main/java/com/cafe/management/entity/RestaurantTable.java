@@ -32,6 +32,12 @@ public class RestaurantTable {
     @Column(name = "qr_token", unique = true, length = 100)
     private String qrToken;
 
+    @Column(name = "current_token_serial", length = 50)
+    private String currentTokenSerial;
+
+    @Column(name = "current_session_id", length = 100)
+    private String currentSessionId;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Category, MenuItem, RestaurantTable, Cart, Order } from '../models/cafe.models';
+import { Category, MenuItem, RestaurantTable, Cart, Order, Invoice } from '../models/cafe.models';
 
 @Injectable({
   providedIn: 'root'
@@ -62,11 +62,39 @@ export class CustomerService {
     return this.http.get<Order>(`${this.apiUrl}/order/table/${tableId}/active`);
   }
 
-  occupyTable(tableId: number): Observable<RestaurantTable> {
-    return this.http.post<RestaurantTable>(`${this.apiUrl}/table/${tableId}/occupy`, {});
+  occupyTable(tableId: number, sessionId?: string, customerTokenSerial?: string): Observable<RestaurantTable> {
+    let params: any = {};
+    if (sessionId) params.sessionId = sessionId;
+    if (customerTokenSerial) params.customerTokenSerial = customerTokenSerial;
+    return this.http.post<RestaurantTable>(`${this.apiUrl}/table/${tableId}/occupy`, {}, { params });
+  }
+
+  switchTable(sessionId: string, fromTableId: number, toTableId: number, customerTokenSerial: string): Observable<Order> {
+    return this.http.post<Order>(`${this.apiUrl}/table/switch`, {
+      sessionId,
+      fromTableId,
+      toTableId,
+      customerTokenSerial
+    });
   }
 
   requestBill(tableId: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/table/${tableId}/request-bill`, {});
+  }
+
+  getInvoice(orderId: number): Observable<Invoice> {
+    return this.http.get<Invoice>(`${this.apiUrl}/invoice/order/${orderId}`);
+  }
+
+  payInvoice(orderId: number, paymentMethod: string, transactionRef?: string): Observable<Invoice> {
+    return this.http.post<Invoice>(`${this.apiUrl}/invoice/pay`, {
+      orderId,
+      paymentMethod,
+      transactionRef
+    });
+  }
+
+  downloadInvoicePdf(orderId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/invoice/order/${orderId}/pdf`, { responseType: 'blob' }) as Observable<Blob>;
   }
 }
