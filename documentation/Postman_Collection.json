@@ -1,0 +1,93 @@
+{
+  "info": {
+    "_postman_id": "cafe-management-api-collection",
+    "name": "Cafe Management System REST API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Staff",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer QR Flow",
+      "item": [
+        {
+          "name": "Get Table Info",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/customer/table/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "customer", "table", "1"] }
+          }
+        },
+        {
+          "name": "Get Menu Categories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/customer/categories", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "customer", "categories"] }
+          }
+        },
+        {
+          "name": "Get Menu Items",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/customer/menu", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "customer", "menu"] }
+          }
+        },
+        {
+          "name": "Place Customer Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"SESS-DEMO123\",\n  \"tableId\": 1,\n  \"customerName\": \"John Customer\",\n  \"items\": [\n    { \"menuItemId\": 1, \"quantity\": 2, \"notes\": \"Extra hot\" },\n    { \"menuItemId\": 6, \"quantity\": 1, \"notes\": \"No onions\" }\n  ]\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/customer/order/place", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "customer", "order", "place"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kitchen Dashboard",
+      "item": [
+        {
+          "name": "Get Live Orders",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/kitchen/orders/live", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "kitchen", "orders", "live"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cashier Billing",
+      "item": [
+        {
+          "name": "Apply Coupon",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"couponCode\": \"WELCOME10\",\n  \"subtotal\": 50.00\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/cashier/coupon/apply", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "cashier", "coupon", "apply"] }
+          }
+        }
+      ]
+    }
+  ]
+}

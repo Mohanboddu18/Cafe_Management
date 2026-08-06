@@ -1,0 +1,44 @@
+{
+  "name": "cafe-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^19.0.0",
+    "@angular/cdk": "^19.0.0",
+    "@angular/common": "^19.0.0",
+    "@angular/compiler": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@angular/forms": "^19.0.0",
+    "@angular/material": "^19.0.0",
+    "@angular/platform-browser": "^19.0.0",
+    "@angular/platform-browser-dynamic": "^19.0.0",
+    "@angular/router": "^19.0.0",
+    "@stomp/stompjs": "^7.0.0",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.2",
+    "html5-qrcode": "^2.3.8",
+    "ng2-charts": "^6.0.1",
+    "qrcode": "^1.5.3",
+    "rxjs": "~7.8.0",
+    "sockjs-client": "^1.6.1",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.0.0",
+    "@angular/cli": "^19.0.0",
+    "@angular/compiler-cli": "^19.0.0",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^18.18.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/sockjs-client": "^1.5.4",
+    "typescript": "~5.6.2"
+  }
+}

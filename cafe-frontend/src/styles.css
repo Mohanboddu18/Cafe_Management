@@ -1,0 +1,112 @@
+/* =========================================================
+   ARTISANAL CAFE DESIGN SYSTEM & STYLES
+   ========================================================= */
+
+:root {
+  --primary-brand: #6F4E37; /* Coffee Brown */
+  --primary-accent: #D4A373; /* Warm Ochre */
+  --secondary-accent: #FAEDCD; /* Warm Cream */
+  --emerald-green: #2A9D8F;
+  --fire-orange: #E76F51;
+  --dark-charcoal: #1D2D44;
+  --light-bg: #F8F9FA;
+  --card-glass-bg: rgba(255, 255, 255, 0.85);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --border-radius: 16px;
+  --transition-speed: 0.3s ease;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--light-bg);
+  color: #2D3748;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: var(--card-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Buttons */
+.btn-cafe {
+  background: linear-gradient(135deg, var(--primary-brand), #523725);
+  color: #FFFFFF;
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(111, 78, 55, 0.3);
+}
+
+.btn-cafe:hover {
+  background: linear-gradient(135deg, #523725, #382417);
+  color: #FFFFFF;
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(111, 78, 55, 0.4);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--primary-accent), #c28e5d);
+  color: #FFFFFF;
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+}
+
+/* Status Badges */
+.badge-status-available { background-color: #D1E7DD; color: #0F5132; }
+.badge-status-occupied { background-color: #F8D7DA; color: #842029; }
+.badge-status-bill-requested { background-color: #FFF3CD; color: #664D03; }
+
+.badge-order-new { background-color: #CFE2FF; color: #084298; }
+.badge-order-preparing { background-color: #FFF3CD; color: #664D03; }
+.badge-order-ready { background-color: #D1E7DD; color: #0F5132; }
+.badge-order-served { background-color: #E2E3E5; color: #41464B; }
+.badge-order-paid { background-color: #D1E7DD; color: #0F5132; }
+
+/* Custom Pulse Animation */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(231, 111, 81, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(231, 111, 81, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 111, 81, 0); }
+}
+
+.pulse-alert {
+  animation: pulseGlow 1.8s infinite;
+}
+
+/* Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-accent);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-brand);
+}
