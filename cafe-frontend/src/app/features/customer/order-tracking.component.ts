@@ -203,13 +203,74 @@ import { Subscription, interval } from 'rxjs';
                 </div>
 
                 <!-- PAYMENT STATUS: COMPLETED RECEIPT & DOWNLOAD -->
-                <div *ngIf="invoice.paymentStatus === 'COMPLETED'" class="alert alert-success rounded-3 p-4 mb-3 text-center shadow-sm">
+                <div *ngIf="invoice.paymentStatus === 'COMPLETED'" class="alert alert-success rounded-3 p-4 mb-4 text-center shadow-sm">
                   <i class="fa-solid fa-circle-check fs-1 text-success mb-2 d-block"></i>
                   <h4 class="fw-bold mb-1">Payment Completed!</h4>
                   <p class="small text-secondary mb-3">Thank you for dining with us at Artisanal Cafe & Bistro!</p>
                   <button class="btn btn-success btn-lg rounded-pill fw-bold px-4 shadow" (click)="downloadPdf()">
                     <i class="fa-solid fa-file-pdf me-2"></i> Download Thermal Receipt PDF
                   </button>
+                </div>
+
+                <!-- OPTIONAL POST-PAYMENT DISH RATING & FEEDBACK CARD -->
+                <div *ngIf="invoice.paymentStatus === 'COMPLETED'" class="card border-0 glass-card p-4 mb-4 shadow-sm">
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="bg-warning-subtle text-warning p-3 rounded-circle border border-warning">
+                      <i class="fa-solid fa-star fs-3"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-serif fw-bold mb-1 text-dark">Rate Your Dishes & Experience (Optional)</h4>
+                      <span class="text-secondary small">Your ratings help us maintain gourmet standards and update product scores on our live menu!</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="!reviewSubmitted">
+                    <div class="row g-3 mb-4">
+                      <div class="col-12" *ngFor="let item of order?.items">
+                        <div class="p-3 bg-light rounded-4 border d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                          <div class="d-flex align-items-center gap-3">
+                            <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80'" 
+                                 class="rounded-3 object-fit-cover shadow-sm" style="width: 55px; height: 55px;" [alt]="item.menuItemName">
+                            <div>
+                              <h6 class="fw-bold mb-0 text-dark">{{ item.menuItemName }}</h6>
+                              <span class="text-muted extra-small">Quantity: {{ item.quantity }} x ₹{{ item.unitPrice.toFixed(2) }}</span>
+                            </div>
+                          </div>
+
+                          <!-- 5 Star Interactive Picker -->
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="small fw-bold text-secondary me-2">Rating:</span>
+                            <div class="d-flex gap-1 fs-5">
+                              <i *ngFor="let star of [1, 2, 3, 4, 5]" 
+                                 class="fa-star cursor-pointer transition-all"
+                                 [ngClass]="star <= getRating(item.menuItemId) ? 'fa-solid text-warning' : 'fa-regular text-muted'"
+                                 (click)="setRating(item.menuItemId, star)"></i>
+                            </div>
+                            <span class="badge bg-warning text-dark font-monospace ms-2">{{ getRating(item.menuItemId) }}.0 / 5.0</span>
+                          </div>
+                        </div>
+
+                        <!-- Optional Comment per Item -->
+                        <div class="mt-2 px-1">
+                          <input type="text" class="form-control form-control-sm rounded-pill font-monospace" 
+                                 placeholder="Optional feedback for {{ item.menuItemName }} (e.g. Delicious taste & aroma)" 
+                                 [(ngModel)]="itemCommentsMap[item.menuItemId]">
+                        </div>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-warning text-dark btn-lg w-100 rounded-pill fw-bold shadow-sm" 
+                            [disabled]="submittingReview" 
+                            (click)="submitItemReviews()">
+                      <i class="fa-solid fa-paper-plane me-2"></i> Submit Ratings & Feedback
+                    </button>
+                  </div>
+
+                  <div *ngIf="reviewSubmitted" class="alert alert-success border-0 rounded-4 text-center p-3 mb-0">
+                    <i class="fa-solid fa-heart text-danger fs-3 mb-2 d-block"></i>
+                    <h5 class="fw-bold text-dark mb-1">Thank You For Your Review! ⭐⭐⭐⭐⭐</h5>
+                    <span class="text-secondary small">Your dish ratings have been recorded and updated on our digital menu!</span>
+                  </div>
                 </div>
 
                 <!-- PAYMENT SELECTION OPTIONS (If PENDING or UNPAID) -->
@@ -446,6 +507,48 @@ export class OrderTrackingComponent implements OnInit, OnDestroy {
       next: () => {
         this.toastService.show('Bill request sent to Cashier!', 'info');
         this.fetchInvoice();
+      }
+    });
+  }
+
+  itemRatingsMap: { [menuItemId: number]: number } = {};
+  itemCommentsMap: { [menuItemId: number]: string } = {};
+  reviewSubmitted = false;
+  submittingReview = false;
+
+  setRating(menuItemId: number, rating: number): void {
+    this.itemRatingsMap[menuItemId] = rating;
+  }
+
+  getRating(menuItemId: number): number {
+    return this.itemRatingsMap[menuItemId] || 5;
+  }
+
+  submitItemReviews(): void {
+    if (!this.order) return;
+    this.submittingReview = true;
+
+    const ratings = this.order.items.map(item => ({
+      menuItemId: item.menuItemId,
+      rating: this.getRating(item.menuItemId),
+      comment: this.itemCommentsMap[item.menuItemId] || ''
+    }));
+
+    const req = {
+      orderId: this.order.id,
+      customerName: this.order.customerName,
+      ratings: ratings
+    };
+
+    this.customerService.submitReview(req).subscribe({
+      next: () => {
+        this.submittingReview = false;
+        this.reviewSubmitted = true;
+        this.toastService.show('Thank you! Your dish ratings and feedback have been recorded & updated on the menu!', 'success');
+      },
+      error: () => {
+        this.submittingReview = false;
+        this.toastService.show('Failed to submit ratings', 'error');
       }
     });
   }

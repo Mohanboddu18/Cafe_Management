@@ -148,16 +148,29 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
       <div class="row g-4">
         <div class="col-md-6 col-lg-4" *ngFor="let item of filteredMenuItems">
           <div class="glass-card h-100 overflow-hidden d-flex flex-column hover-lift" style="cursor: pointer;" (click)="openItemModal(item)">
-            <div class="position-relative" style="height: 200px; overflow: hidden;">
+            <div class="position-relative image-skeleton-container" style="height: 200px; overflow: hidden;">
+              <!-- Animated Skeleton Shimmer & Loading Overlay -->
+              <div *ngIf="!imageLoadedMap[item.id]" class="image-skeleton-shimmer">
+                <i class="fa-solid fa-mug-hot text-warning fs-1 mb-2 pulse-alert"></i>
+                <span class="extra-small fw-bold text-secondary font-monospace">PREPARING IMAGE...</span>
+              </div>
+
               <img [src]="item.imageUrl || defaultFallbackImg" 
-                   (error)="onImgError($event)"
-                   class="w-100 h-100 object-fit-cover transition-scale" [alt]="item.name">
+                   (load)="onImgLoad(item.id)"
+                   (error)="onImgError($event, item.id)"
+                   class="w-100 h-100 object-fit-cover transition-scale img-smooth-load"
+                   [class.loaded]="imageLoadedMap[item.id]"
+                   [alt]="item.name">
+
               <span class="position-absolute top-0 start-0 m-3 badge rounded-pill"
-                    [ngClass]="item.isVeg ? 'bg-success' : 'bg-danger'">
+                    [ngClass]="item.isVeg ? 'bg-success' : 'bg-danger'" style="z-index: 3;">
                 {{ item.isVeg ? 'VEG 🌱' : 'NON-VEG 🍗' }}
               </span>
-              <span class="position-absolute top-0 end-0 m-3 badge bg-dark opacity-75 rounded-pill">
+              <span class="position-absolute top-0 end-0 m-3 badge bg-dark opacity-75 rounded-pill" style="z-index: 3;">
                 <i class="fa-regular fa-clock me-1"></i>{{ item.prepTimeMins }} mins
+              </span>
+              <span class="position-absolute bottom-0 start-0 m-3 badge bg-dark text-warning rounded-pill shadow-sm" style="z-index: 3;">
+                <i class="fa-solid fa-star me-1"></i>{{ item.averageRating || 4.8 }} <span class="text-white-50 ms-1 font-monospace">({{ item.totalRatings || 1 }})</span>
               </span>
             </div>
 
@@ -199,11 +212,19 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden" *ngIf="selectedItem">
           
-          <!-- Modal Header Image Banner -->
-          <div class="position-relative" style="height: 260px; overflow: hidden;">
+          <!-- Modal Header Image Banner with Skeleton Loading -->
+          <div class="position-relative image-skeleton-container" style="height: 260px; overflow: hidden;">
+            <div *ngIf="!modalImgLoaded" class="image-skeleton-shimmer">
+              <i class="fa-solid fa-mug-hot text-warning fs-1 mb-2 pulse-alert"></i>
+              <span class="small fw-bold text-secondary font-monospace">LOADING DISH PREVIEW...</span>
+            </div>
+
             <img [src]="selectedItem.imageUrl || defaultFallbackImg" 
-                 (error)="onImgError($event)"
-                 class="w-100 h-100 object-fit-cover" [alt]="selectedItem.name">
+                 (load)="modalImgLoaded = true"
+                 (error)="onImgError($event); modalImgLoaded = true"
+                 class="w-100 h-100 object-fit-cover img-smooth-load"
+                 [class.loaded]="modalImgLoaded"
+                 [alt]="selectedItem.name">
             <div class="position-absolute top-0 start-0 end-0 bottom-0" 
                  style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%);">
             </div>
@@ -450,9 +471,33 @@ export class MenuComponent implements OnInit {
   modalNotes = '';
   showDetailModal = false;
   defaultFallbackImg = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80';
+  imageLoadedMap: { [key: number]: boolean } = {};
+  modalImgLoaded = false;
 
-  onImgError(event: any): void {
+  onImgLoad(id: number): void {
+    this.imageLoadedMap[id] = true;
+  }
+
+  onImgError(event: any, id?: number): void {
     event.target.src = this.defaultFallbackImg;
+    if (id !== undefined) {
+      this.imageLoadedMap[id] = true;
+    }
+  }
+
+  // Modal Handlers
+  openItemModal(item: MenuItem): void {
+    this.selectedItem = item;
+    this.modalQuantity = 1;
+    this.modalSugarPackets = 0;
+    this.modalNotes = '';
+    this.modalImgLoaded = false;
+    this.showDetailModal = true;
+  }
+
+  closeItemModal(): void {
+    this.showDetailModal = false;
+    this.selectedItem = null;
   }
 
   constructor(
@@ -604,20 +649,6 @@ export class MenuComponent implements OnInit {
 
       return matchCat && matchSearch && matchDiet;
     });
-  }
-
-  // Modal Handlers
-  openItemModal(item: MenuItem): void {
-    this.selectedItem = item;
-    this.modalQuantity = 1;
-    this.modalSugarPackets = 0;
-    this.modalNotes = '';
-    this.showDetailModal = true;
-  }
-
-  closeItemModal(): void {
-    this.showDetailModal = false;
-    this.selectedItem = null;
   }
 
   isCoffeeItem(item: MenuItem | null): boolean {

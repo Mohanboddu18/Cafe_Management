@@ -1,6 +1,7 @@
 com\cafe\management\dto\BillingDTOs$InvoiceResponse.class
 com\cafe\management\entity\Order.class
 com\cafe\management\dto\OrderDTOs$StatusUpdateRequest.class
+com\cafe\management\dto\ReviewDTOs$ReviewResponse$ReviewResponseBuilder.class
 com\cafe\management\entity\Customer$CustomerBuilder.class
 com\cafe\management\entity\MenuItem.class
 com\cafe\management\service\AuthService.class
@@ -17,6 +18,7 @@ com\cafe\management\security\JwtUtils.class
 com\cafe\management\dto\OrderDTOs$OrderItemResponse$OrderItemResponseBuilder.class
 com\cafe\management\entity\Invoice$InvoiceBuilder.class
 com\cafe\management\repository\CategoryRepository.class
+com\cafe\management\repository\MenuItemReviewRepository.class
 com\cafe\management\security\UserDetailsServiceImpl.class
 com\cafe\management\repository\AuditLogRepository.class
 com\cafe\management\entity\Inventory.class
@@ -28,6 +30,7 @@ com\cafe\management\dto\BillingDTOs$InvoiceResponse$InvoiceResponseBuilder.class
 com\cafe\management\config\CorsConfig.class
 com\cafe\management\dto\AuthDTOs$SignupRequest.class
 com\cafe\management\entity\AuditLog.class
+com\cafe\management\entity\MenuItemReview.class
 com\cafe\management\security\UserDetailsImpl.class
 com\cafe\management\dto\OrderDTOs$CartItemRequest.class
 com\cafe\management\repository\UserRepository.class
@@ -42,9 +45,11 @@ com\cafe\management\dto\BillingDTOs.class
 com\cafe\management\entity\Invoice.class
 com\cafe\management\dto\OrderDTOs.class
 com\cafe\management\entity\OrderItem$OrderItemBuilder.class
+com\cafe\management\dto\ReviewDTOs$SubmitReviewRequest.class
 com\cafe\management\entity\Notification$NotificationBuilder.class
 com\cafe\management\dto\BillingDTOs$ProcessPaymentRequest.class
 com\cafe\management\controller\WaiterController.class
+com\cafe\management\dto\ReviewDTOs$ItemRatingRequest.class
 com\cafe\management\repository\MenuItemRepository.class
 com\cafe\management\entity\QrCodeEntity$QrCodeEntityBuilder.class
 com\cafe\management\repository\StockHistoryRepository.class
@@ -57,13 +62,17 @@ com\cafe\management\entity\StockHistory.class
 com\cafe\management\service\TableQrService.class
 com\cafe\management\repository\InvoiceRepository.class
 com\cafe\management\dto\OrderDTOs$OrderItemResponse.class
+com\cafe\management\dto\ReviewDTOs$ReviewResponse.class
 com\cafe\management\entity\KitchenOrder$KitchenOrderBuilder.class
 com\cafe\management\dto\OrderDTOs$SwitchTableRequest.class
 com\cafe\management\entity\RestaurantTable.class
+com\cafe\management\dto\ReviewDTOs$SubmitReviewRequest$SubmitReviewRequestBuilder.class
+com\cafe\management\dto\ReviewDTOs$ItemRatingRequest$ItemRatingRequestBuilder.class
 com\cafe\management\controller\CashierController.class
 com\cafe\management\dto\AnalyticsDTOs$RecentOrderSummary.class
 com\cafe\management\repository\CartItemRepository.class
 com\cafe\management\repository\CartRepository.class
+com\cafe\management\entity\MenuItemReview$MenuItemReviewBuilder.class
 com\cafe\management\entity\Role.class
 com\cafe\management\dto\BillingDTOs$ApplyCouponRequest.class
 com\cafe\management\entity\OrderItem.class
@@ -85,6 +94,7 @@ com\cafe\management\dto\BillingDTOs$ApplyCouponResponse$ApplyCouponResponseBuild
 com\cafe\management\controller\AuthController.class
 com\cafe\management\entity\User.class
 com\cafe\management\dto\AuthDTOs$MessageResponse.class
+com\cafe\management\dto\ReviewDTOs.class
 com\cafe\management\service\BillingInvoiceService.class
 com\cafe\management\security\AuthTokenFilter.class
 com\cafe\management\dto\AnalyticsDTOs$PopularItem$PopularItemBuilder.class
@@ -104,7 +114,9 @@ com\cafe\management\repository\QrCodeRepository.class
 com\cafe\management\exception\ResourceNotFoundException.class
 com\cafe\management\entity\KitchenOrder.class
 com\cafe\management\service\MenuItemService.class
+com\cafe\management\controller\ReviewController.class
 com\cafe\management\dto\OrderDTOs$OrderResponse$OrderResponseBuilder.class
+com\cafe\management\service\ReviewService.class
 com\cafe\management\service\CouponService.class
 com\cafe\management\dto\AnalyticsDTOs$DashboardSummary$DashboardSummaryBuilder.class
 com\cafe\management\repository\CouponRepository.class

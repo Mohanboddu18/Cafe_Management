@@ -97,4 +97,12 @@ export class CustomerService {
   downloadInvoicePdf(orderId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/invoice/order/${orderId}/pdf`, { responseType: 'blob' }) as Observable<Blob>;
   }
+
+  submitReview(reviewData: any): Observable<any[]> {
+    return this.http.post<any[]>('http://localhost:8080/api/reviews/submit', reviewData);
+  }
+
+  getItemReviews(menuItemId: number): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:8080/api/reviews/item/${menuItemId}`);
+  }
 }

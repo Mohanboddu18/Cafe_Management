@@ -46,6 +46,14 @@ public class MenuItem {
     @Column(name = "is_featured")
     private Boolean isFeatured = false;
 
+    @Column(name = "average_rating")
+    @Builder.Default
+    private Double averageRating = 4.8;
+
+    @Column(name = "total_ratings")
+    @Builder.Default
+    private Integer totalRatings = 1;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

@@ -29,6 +29,30 @@ export interface MenuItem {
   isFeatured: boolean;
   categoryId?: number;
   category?: Category;
+  averageRating?: number;
+  totalRatings?: number;
+}
+
+export interface ItemRatingRequest {
+  menuItemId: number;
+  rating: number;
+  comment?: string;
+}
+
+export interface SubmitReviewRequest {
+  orderId: number;
+  customerName?: string;
+  ratings: ItemRatingRequest[];
+}
+
+export interface ReviewResponse {
+  id: number;
+  menuItemId: number;
+  menuItemName: string;
+  rating: number;
+  comment?: string;
+  customerName?: string;
+  createdAt: string;
 }
 
 export interface RestaurantTable {
