@@ -7,7 +7,7 @@ import { Category, MenuItem, RestaurantTable, Coupon, Inventory, StockHistory, D
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:8080/api/admin';
+  private apiUrl = '/api/admin';
 
   constructor(private http: HttpClient) {}
 

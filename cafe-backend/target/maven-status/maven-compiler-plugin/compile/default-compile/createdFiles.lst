@@ -3,6 +3,7 @@ com\cafe\management\entity\Order.class
 com\cafe\management\dto\OrderDTOs$StatusUpdateRequest.class
 com\cafe\management\dto\ReviewDTOs$ReviewResponse$ReviewResponseBuilder.class
 com\cafe\management\entity\Customer$CustomerBuilder.class
+com\cafe\management\controller\RootController.class
 com\cafe\management\entity\MenuItem.class
 com\cafe\management\service\AuthService.class
 com\cafe\management\service\CartService.class
@@ -85,11 +86,13 @@ com\cafe\management\repository\InventoryRepository.class
 com\cafe\management\security\AuthEntryPointJwt.class
 com\cafe\management\repository\PaymentRepository.class
 com\cafe\management\dto\AnalyticsDTOs$RecentOrderSummary$RecentOrderSummaryBuilder.class
+com\cafe\management\config\SpaWebMvcConfig$1.class
 com\cafe\management\entity\Role$RoleBuilder.class
 com\cafe\management\entity\Payment$PaymentBuilder.class
 com\cafe\management\entity\RestaurantTable$RestaurantTableBuilder.class
 com\cafe\management\dto\AuthDTOs$JwtResponse.class
 com\cafe\management\entity\Cart$CartBuilder.class
+com\cafe\management\config\SpaWebMvcConfig.class
 com\cafe\management\dto\BillingDTOs$ApplyCouponResponse$ApplyCouponResponseBuilder.class
 com\cafe\management\controller\AuthController.class
 com\cafe\management\entity\User.class

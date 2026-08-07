@@ -7,7 +7,7 @@ import { Category, MenuItem, RestaurantTable, Cart, Order, Invoice } from '../mo
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'http://localhost:8080/api/customer';
+  private apiUrl = '/api/customer';
 
   constructor(private http: HttpClient) {}
 
@@ -99,10 +99,10 @@ export class CustomerService {
   }
 
   submitReview(reviewData: any): Observable<any[]> {
-    return this.http.post<any[]>('http://localhost:8080/api/reviews/submit', reviewData);
+    return this.http.post<any[]>('/api/reviews/submit', reviewData);
   }
 
   getItemReviews(menuItemId: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/reviews/item/${menuItemId}`);
+    return this.http.get<any[]>(`/api/reviews/item/${menuItemId}`);
   }
 }

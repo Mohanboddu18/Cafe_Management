@@ -175,7 +175,6 @@ public class BillingInvoiceService {
         order.setStatus("BILL_REQUESTED");
         orderRepository.save(order);
 
-        final BigDecimal finalDiscount = discountAmount;
         Invoice invoice = invoiceRepository.findByOrderId(order.getId())
                 .orElseGet(() -> Invoice.builder()
                         .invoiceNumber("INV-" + System.currentTimeMillis() % 1000000)
@@ -186,6 +185,7 @@ public class BillingInvoiceService {
                         .gstAmount(gstAmount)
                         .totalPayable(totalPayable)
                         .paymentStatus("PENDING")
+                        .createdAt(LocalDateTime.now())
                         .pdfUrl("/api/cashier/invoice/" + order.getId() + "/pdf")
                         .build()
                 );
@@ -196,6 +196,9 @@ public class BillingInvoiceService {
         invoice.setGstAmount(gstAmount);
         invoice.setTotalPayable(totalPayable);
         invoice.setPaymentStatus("PENDING");
+        if (invoice.getCreatedAt() == null) {
+            invoice.setCreatedAt(LocalDateTime.now());
+        }
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
         String billMsg = "Bill Invoice generated for Table #" + order.getTable().getTableNumber() + " (Total: ₹" + totalPayable + "). Customer can now pay via UPI, Card, or Cash.";
@@ -336,9 +339,9 @@ public class BillingInvoiceService {
                     .setMarginBottom(4));
 
             // Metadata Table
-            Table metaTable = new Table(UnitValue.createPercentArray(new float[]{50, 50})).useAllAvailableWidth();
+            LocalDateTime invDate = invoice.getCreatedAt() != null ? invoice.getCreatedAt() : LocalDateTime.now();
             metaTable.addCell(new Cell().add(new Paragraph("Inv #: " + invoice.getInvoiceNumber()).setFontSize(8).setBold()).setBorder(null));
-            metaTable.addCell(new Cell().add(new Paragraph("Date: " + invoice.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"))).setFontSize(8).setTextAlignment(TextAlignment.RIGHT)).setBorder(null));
+            metaTable.addCell(new Cell().add(new Paragraph("Date: " + invDate.format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"))).setFontSize(8).setTextAlignment(TextAlignment.RIGHT)).setBorder(null));
             metaTable.addCell(new Cell().add(new Paragraph("Table: #" + order.getTable().getTableNumber()).setFontSize(8)).setBorder(null));
             metaTable.addCell(new Cell().add(new Paragraph("Order #: " + order.getOrderNumber()).setFontSize(8).setTextAlignment(TextAlignment.RIGHT)).setBorder(null));
             doc.add(metaTable);
@@ -435,7 +438,7 @@ public class BillingInvoiceService {
                 .paymentMethod(payment != null ? payment.getPaymentMethod() : "PENDING")
                 .paymentStatus(payment != null ? payment.getPaymentStatus() : (invoice.getPaymentStatus() != null ? invoice.getPaymentStatus() : "PENDING"))
                 .pdfUrl(invoice.getPdfUrl())
-                .createdAt(invoice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .createdAt(invoice.getCreatedAt() != null ? invoice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                 .items(orderRes.getItems())
                 .build();
     }

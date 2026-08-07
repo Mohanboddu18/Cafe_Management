@@ -7,7 +7,7 @@ import { Order, NotificationMsg } from '../models/cafe.models';
   providedIn: 'root'
 })
 export class KitchenService {
-  private apiUrl = 'http://localhost:8080/api/kitchen';
+  private apiUrl = '/api/kitchen';
 
   constructor(private http: HttpClient) {}
 

@@ -16,6 +16,7 @@ C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\re
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\controller\CashierController.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\config\OpenAPIConfig.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\repository\InventoryRepository.java
+C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\config\SpaWebMvcConfig.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\repository\KitchenOrderRepository.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\repository\MenuItemReviewRepository.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\dto\OrderDTOs.java
