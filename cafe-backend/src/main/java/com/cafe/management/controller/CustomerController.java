@@ -128,6 +128,11 @@ public class CustomerController {
         return ResponseEntity.ok(billingInvoiceService.customerPayInvoice(request));
     }
 
+    @PostMapping("/invoice/generate")
+    public ResponseEntity<InvoiceResponse> generateBill(@RequestBody GenerateInvoiceRequest request) {
+        return ResponseEntity.ok(billingInvoiceService.generateBillForCustomer(request));
+    }
+
     @PostMapping("/table/{tableId}/request-bill")
     public ResponseEntity<Void> requestBill(@PathVariable Long tableId) {
         orderService.requestBillForTable(tableId);

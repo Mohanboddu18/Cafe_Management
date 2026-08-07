@@ -314,10 +314,21 @@ public class BillingInvoiceService {
     }
 
     public InvoiceResponse getInvoiceByOrderId(Long orderId) {
-        Invoice invoice = invoiceRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for order id: " + orderId));
+        if (orderId == null) {
+            throw new BadRequestException("Order ID is required");
+        }
+
+        Invoice invoice = invoiceRepository.findByOrderId(orderId).orElse(null);
+        if (invoice == null) {
+            // Auto-generate invoice if order exists
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+            GenerateInvoiceRequest genReq = new GenerateInvoiceRequest(orderId, null, BigDecimal.valueOf(5.0));
+            return generateBillForCustomer(genReq);
+        }
+
         List<Payment> payments = paymentRepository.findByInvoiceId(invoice.getId());
-        Payment payment = payments.isEmpty() ? null : payments.get(0);
+        Payment payment = (payments != null && !payments.isEmpty()) ? payments.get(0) : null;
         return mapToInvoiceResponse(invoice, payment);
     }
 
