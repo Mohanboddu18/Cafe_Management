@@ -151,20 +151,28 @@ public class BillingInvoiceService {
 
     @Transactional
     public InvoiceResponse generateBillForCustomer(GenerateInvoiceRequest request) {
-        Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        if (request == null || request.getOrderId() == null) {
+            throw new BadRequestException("Order ID is required to generate invoice");
+        }
 
-        BigDecimal subtotal = order.getTotalAmount();
+        Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + request.getOrderId()));
+
+        BigDecimal subtotal = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
         BigDecimal discountAmount = BigDecimal.ZERO;
 
-        if (request.getCouponCode() != null && !request.getCouponCode().isEmpty()) {
+        if (request.getCouponCode() != null && !request.getCouponCode().trim().isEmpty()) {
             ApplyCouponResponse couponRes = validateAndApplyCoupon(request.getCouponCode(), subtotal);
-            if (couponRes.isValid()) {
+            if (couponRes != null && couponRes.isValid() && couponRes.getDiscountAmount() != null) {
                 discountAmount = couponRes.getDiscountAmount();
             }
         }
 
         BigDecimal subtotalAfterDiscount = subtotal.subtract(discountAmount);
+        if (subtotalAfterDiscount.compareTo(BigDecimal.ZERO) < 0) {
+            subtotalAfterDiscount = BigDecimal.ZERO;
+        }
+
         BigDecimal gstPercentage = request.getGstPercentage() != null ? request.getGstPercentage() : BigDecimal.valueOf(5.0);
         BigDecimal gstAmount = subtotalAfterDiscount.multiply(gstPercentage).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal totalPayable = subtotalAfterDiscount.add(gstAmount);
@@ -176,20 +184,25 @@ public class BillingInvoiceService {
         orderRepository.save(order);
 
         final BigDecimal finalDiscount = discountAmount;
+        final BigDecimal finalSubtotal = subtotal;
+        final BigDecimal finalGstAmount = gstAmount;
+        final BigDecimal finalTotalPayable = totalPayable;
+
         Invoice invoice = invoiceRepository.findByOrderId(order.getId())
-                .orElseGet(() -> Invoice.builder()
-                        .invoiceNumber("INV-" + System.currentTimeMillis() % 1000000)
-                        .order(order)
-                        .subtotal(subtotal)
-                        .discount(finalDiscount)
-                        .couponCode(request.getCouponCode())
-                        .gstAmount(gstAmount)
-                        .totalPayable(totalPayable)
-                        .paymentStatus("PENDING")
-                        .createdAt(LocalDateTime.now())
-                        .pdfUrl("/api/cashier/invoice/" + order.getId() + "/pdf")
-                        .build()
-                );
+                .orElseGet(() -> {
+                    Invoice newInv = new Invoice();
+                    newInv.setInvoiceNumber("INV-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 900 + 100));
+                    newInv.setOrder(order);
+                    newInv.setSubtotal(finalSubtotal);
+                    newInv.setDiscount(finalDiscount);
+                    newInv.setCouponCode(request.getCouponCode());
+                    newInv.setGstAmount(finalGstAmount);
+                    newInv.setTotalPayable(finalTotalPayable);
+                    newInv.setPaymentStatus("PENDING");
+                    newInv.setCreatedAt(LocalDateTime.now());
+                    newInv.setPdfUrl("/api/cashier/invoice/" + order.getId() + "/pdf");
+                    return newInv;
+                });
 
         invoice.setSubtotal(subtotal);
         invoice.setDiscount(discountAmount);
@@ -200,11 +213,24 @@ public class BillingInvoiceService {
         if (invoice.getCreatedAt() == null) {
             invoice.setCreatedAt(LocalDateTime.now());
         }
+        if (invoice.getPdfUrl() == null) {
+            invoice.setPdfUrl("/api/cashier/invoice/" + order.getId() + "/pdf");
+        }
+        if (invoice.getInvoiceNumber() == null || invoice.getInvoiceNumber().isEmpty()) {
+            invoice.setInvoiceNumber("INV-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 900 + 100));
+        }
+
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
-        String billMsg = "Bill Invoice generated for Table #" + order.getTable().getTableNumber() + " (Total: ₹" + totalPayable + "). Customer can now pay via UPI, Card, or Cash.";
-        notificationService.sendNotification("WAITER", "📄 Bill Invoice Generated", billMsg, order.getId(), order.getTable().getId());
-        notificationService.sendNotification("CASHIER", "📄 Bill Invoice Generated", billMsg, order.getId(), order.getTable().getId());
+        try {
+            String tableNum = (order.getTable() != null) ? String.valueOf(order.getTable().getTableNumber()) : "N/A";
+            Long tableId = (order.getTable() != null) ? order.getTable().getId() : null;
+            String billMsg = "Bill Invoice generated for Table #" + tableNum + " (Total: ₹" + totalPayable + "). Customer can now pay via UPI, Card, or Cash.";
+            notificationService.sendNotification("WAITER", "📄 Bill Invoice Generated", billMsg, order.getId(), tableId);
+            notificationService.sendNotification("CASHIER", "📄 Bill Invoice Generated", billMsg, order.getId(), tableId);
+        } catch (Exception notifEx) {
+            System.err.println("Notification send failed: " + notifEx.getMessage());
+        }
 
         return mapToInvoiceResponse(savedInvoice, null);
     }
@@ -425,23 +451,25 @@ public class BillingInvoiceService {
     }
 
     private InvoiceResponse mapToInvoiceResponse(Invoice invoice, Payment payment) {
-        OrderDTOs.OrderResponse orderRes = orderService.mapToOrderResponse(invoice.getOrder());
+        if (invoice == null) return null;
+        OrderDTOs.OrderResponse orderRes = (invoice.getOrder() != null) ? orderService.mapToOrderResponse(invoice.getOrder()) : null;
+        List<OrderDTOs.OrderItemResponse> items = (orderRes != null && orderRes.getItems() != null) ? orderRes.getItems() : new java.util.ArrayList<>();
         return InvoiceResponse.builder()
                 .id(invoice.getId())
                 .invoiceNumber(invoice.getInvoiceNumber())
-                .orderId(invoice.getOrder().getId())
-                .orderNumber(invoice.getOrder().getOrderNumber())
-                .tableNumber(invoice.getOrder().getTable().getTableNumber())
-                .subtotal(invoice.getSubtotal())
-                .discount(invoice.getDiscount())
+                .orderId(invoice.getOrder() != null ? invoice.getOrder().getId() : null)
+                .orderNumber(invoice.getOrder() != null ? invoice.getOrder().getOrderNumber() : null)
+                .tableNumber((invoice.getOrder() != null && invoice.getOrder().getTable() != null) ? invoice.getOrder().getTable().getTableNumber() : null)
+                .subtotal(invoice.getSubtotal() != null ? invoice.getSubtotal() : BigDecimal.ZERO)
+                .discount(invoice.getDiscount() != null ? invoice.getDiscount() : BigDecimal.ZERO)
                 .couponCode(invoice.getCouponCode())
-                .gstAmount(invoice.getGstAmount())
-                .totalPayable(invoice.getTotalPayable())
+                .gstAmount(invoice.getGstAmount() != null ? invoice.getGstAmount() : BigDecimal.ZERO)
+                .totalPayable(invoice.getTotalPayable() != null ? invoice.getTotalPayable() : BigDecimal.ZERO)
                 .paymentMethod(payment != null ? payment.getPaymentMethod() : "PENDING")
                 .paymentStatus(payment != null ? payment.getPaymentStatus() : (invoice.getPaymentStatus() != null ? invoice.getPaymentStatus() : "PENDING"))
                 .pdfUrl(invoice.getPdfUrl())
                 .createdAt(invoice.getCreatedAt() != null ? invoice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .items(orderRes.getItems())
+                .items(items)
                 .build();
     }
 }
