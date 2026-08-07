@@ -13,6 +13,17 @@ import { Subscription, interval } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
+    <div class="container py-5 text-center" *ngIf="!order">
+      <div class="glass-card p-5 mx-auto rounded-4 shadow-sm" style="max-width: 600px;">
+        <div class="spinner-border text-warning mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h3 class="font-serif fw-bold">Loading Order Details...</h3>
+        <p class="text-muted">Fetching live order status and digital bill invoice for your table.</p>
+        <a routerLink="/customer/tables" class="btn btn-warning text-dark px-4 py-2 rounded-pill fw-bold">
+          <i class="fa-solid fa-table me-2"></i> View All Tables
+        </a>
+      </div>
+    </div>
+
     <div class="container py-5" *ngIf="order">
       <div class="row justify-content-center">
         <div class="col-lg-8">

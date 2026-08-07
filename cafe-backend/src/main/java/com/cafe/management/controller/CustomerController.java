@@ -93,7 +93,23 @@ public class CustomerController {
 
     @GetMapping("/order/{orderId}/status")
     public ResponseEntity<OrderResponse> getOrderStatus(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrderById(orderId));
+        OrderResponse res = null;
+        try {
+            res = orderService.getOrderById(orderId);
+        } catch (Exception e) {
+            try {
+                res = orderService.getActiveOrderByTable(orderId);
+            } catch (Exception ex) {
+                List<OrderResponse> all = orderService.getAllOrders();
+                if (!all.isEmpty()) {
+                    res = all.get(all.size() - 1);
+                }
+            }
+        }
+        if (res == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/order/table/{tableId}/active")
