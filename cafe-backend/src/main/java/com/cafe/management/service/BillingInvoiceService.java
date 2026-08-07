@@ -256,9 +256,15 @@ public class BillingInvoiceService {
             invoiceRepository.save(invoice);
             paymentRepository.save(payment);
 
-            String cashAlertMsg = "💵 CASH PAYMENT ALERT: Table #" + table.getTableNumber() + " selected CASH payment (₹" + invoice.getTotalPayable() + "). Waiter, please collect cash from table and submit to Cashier!";
-            notificationService.sendNotification("WAITER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
-            notificationService.sendNotification("CASHIER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
+            try {
+                if (table != null) {
+                    String cashAlertMsg = "💵 CASH PAYMENT ALERT: Table #" + table.getTableNumber() + " selected CASH payment (₹" + invoice.getTotalPayable() + "). Waiter, please collect cash from table and submit to Cashier!";
+                    notificationService.sendNotification("WAITER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
+                    notificationService.sendNotification("CASHIER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
+                }
+            } catch (Exception notifEx) {
+                System.err.println("Notification error: " + notifEx.getMessage());
+            }
         } else {
             // Online Payment (UPI / CARD)
             invoice.setPaymentStatus("COMPLETED");
@@ -269,14 +275,20 @@ public class BillingInvoiceService {
             paymentRepository.save(payment);
 
             // Free Table in MySQL
-            table.setStatus("AVAILABLE");
-            table.setCurrentSessionId(null);
-            table.setCurrentTokenSerial(null);
-            tableRepository.save(table);
+            if (table != null) {
+                table.setStatus("AVAILABLE");
+                table.setCurrentSessionId(null);
+                table.setCurrentTokenSerial(null);
+                tableRepository.save(table);
 
-            String onlinePayMsg = "✅ Table #" + table.getTableNumber() + " Paid ₹" + invoice.getTotalPayable() + " via " + pMethod + "! Table is now FREE.";
-            notificationService.sendNotification("WAITER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
-            notificationService.sendNotification("CASHIER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
+                try {
+                    String onlinePayMsg = "✅ Table #" + table.getTableNumber() + " Paid ₹" + invoice.getTotalPayable() + " via " + pMethod + "! Table is now FREE.";
+                    notificationService.sendNotification("WAITER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
+                    notificationService.sendNotification("CASHIER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
+                } catch (Exception notifEx) {
+                    System.err.println("Notification error: " + notifEx.getMessage());
+                }
+            }
         }
 
         return mapToInvoiceResponse(invoice, payment);
@@ -287,11 +299,13 @@ public class BillingInvoiceService {
         Invoice invoice = invoiceRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for order id: " + orderId));
         Order order = invoice.getOrder();
-        RestaurantTable table = order.getTable();
+        RestaurantTable table = order != null ? order.getTable() : null;
 
         invoice.setPaymentStatus("COMPLETED");
-        order.setStatus("PAID");
-        orderRepository.save(order);
+        if (order != null) {
+            order.setStatus("PAID");
+            orderRepository.save(order);
+        }
         invoiceRepository.save(invoice);
 
         Payment payment = paymentRepository.findByInvoiceId(invoice.getId()).stream().findFirst().orElseGet(() ->
@@ -301,14 +315,20 @@ public class BillingInvoiceService {
         paymentRepository.save(payment);
 
         // Free Table in MySQL
-        table.setStatus("AVAILABLE");
-        table.setCurrentSessionId(null);
-        table.setCurrentTokenSerial(null);
-        tableRepository.save(table);
+        if (table != null) {
+            table.setStatus("AVAILABLE");
+            table.setCurrentSessionId(null);
+            table.setCurrentTokenSerial(null);
+            tableRepository.save(table);
 
-        String cashSuccessMsg = "💵 Cash Payment Confirmed for Table #" + table.getTableNumber() + " (₹" + invoice.getTotalPayable() + "). Table is now FREE.";
-        notificationService.sendNotification("WAITER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
-        notificationService.sendNotification("CASHIER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
+            try {
+                String cashSuccessMsg = "💵 Cash Payment Confirmed for Table #" + table.getTableNumber() + " (₹" + invoice.getTotalPayable() + "). Table is now FREE.";
+                notificationService.sendNotification("WAITER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
+                notificationService.sendNotification("CASHIER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
+            } catch (Exception notifEx) {
+                System.err.println("Notification error: " + notifEx.getMessage());
+            }
+        }
 
         return mapToInvoiceResponse(invoice, payment);
     }
