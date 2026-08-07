@@ -2,8 +2,8 @@
 -- CAFE MANAGEMENT SYSTEM - DATABASE SCHEMA (MySQL 8.0)
 -- =========================================================
 
-CREATE DATABASE IF NOT EXISTS `cafe_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `cafe_management`;
+-- CREATE DATABASE IF NOT EXISTS `cafe_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE `cafe_management`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `audit_logs`;

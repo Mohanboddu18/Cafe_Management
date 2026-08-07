@@ -2,7 +2,7 @@
 -- CAFE MANAGEMENT SYSTEM - SEED DATA (MySQL 8.0)
 -- =========================================================
 
-USE `cafe_management`;
+-- USE `cafe_management`;
 -- 1. SEED ROLES
 INSERT INTO `roles` (`id`, `name`, `description`) VALUES
 (1, 'ROLE_ADMIN', 'System Administrator with full access'),
