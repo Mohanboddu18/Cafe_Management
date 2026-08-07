@@ -2,7 +2,7 @@
 -- CAFE MANAGEMENT SYSTEM - DATABASE SCHEMA (MySQL 8.0)
 -- =========================================================
 
--- CREATE DATABASE IF NOT EXISTS `cafe_management` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- CREATE DATABASE IF NOT EXISTS `cafe_management` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 -- USE `cafe_management`;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -34,7 +34,7 @@ CREATE TABLE `roles` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(50) NOT NULL UNIQUE,
     `description` VARCHAR(255)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 2. USERS
 CREATE TABLE `users` (
@@ -47,16 +47,16 @@ CREATE TABLE `users` (
     `role_id` BIGINT NOT NULL,
     `status` VARCHAR(20) DEFAULT 'ACTIVE',
     `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL,
     CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 3. PERMISSIONS
 CREATE TABLE `permissions` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(100) NOT NULL UNIQUE,
     `description` VARCHAR(255)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 4. ROLE PERMISSIONS
 CREATE TABLE `role_permissions` (
@@ -65,7 +65,7 @@ CREATE TABLE `role_permissions` (
     PRIMARY KEY (`role_id`, `permission_id`),
     CONSTRAINT `fk_rp_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_rp_permission` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 5. RESTAURANT TABLES
 CREATE TABLE `restaurant_tables` (
@@ -76,8 +76,8 @@ CREATE TABLE `restaurant_tables` (
     `qr_code_url` VARCHAR(500),
     `qr_token` VARCHAR(100) UNIQUE,
     `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `updated_at` DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 6. QR CODES
 CREATE TABLE `qr_codes` (
@@ -87,7 +87,7 @@ CREATE TABLE `qr_codes` (
     `image_base64` LONGTEXT,
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_qr_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 7. CATEGORIES
 CREATE TABLE `categories` (
@@ -98,7 +98,7 @@ CREATE TABLE `categories` (
     `display_order` INT DEFAULT 0,
     `active` BOOLEAN DEFAULT TRUE,
     `created_at` DATETIME NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 8. MENU ITEMS
 CREATE TABLE `menu_items` (
@@ -113,9 +113,9 @@ CREATE TABLE `menu_items` (
     `is_available` BOOLEAN DEFAULT TRUE,
     `is_featured` BOOLEAN DEFAULT FALSE,
     `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL,
     CONSTRAINT `fk_menu_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 9. CUSTOMERS
 CREATE TABLE `customers` (
@@ -126,7 +126,7 @@ CREATE TABLE `customers` (
     `table_id` BIGINT NOT NULL,
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_customer_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 10. CART
 CREATE TABLE `cart` (
@@ -134,9 +134,9 @@ CREATE TABLE `cart` (
     `session_id` VARCHAR(100) NOT NULL UNIQUE,
     `table_id` BIGINT NOT NULL,
     `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL,
     CONSTRAINT `fk_cart_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 11. CART ITEMS
 CREATE TABLE `cart_items` (
@@ -147,7 +147,7 @@ CREATE TABLE `cart_items` (
     `notes` VARCHAR(255),
     CONSTRAINT `fk_ci_cart` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_ci_menu` FOREIGN KEY (`menu_item_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 12. ORDERS
 CREATE TABLE `orders` (
@@ -162,10 +162,10 @@ CREATE TABLE `orders` (
     `status` VARCHAR(30) NOT NULL DEFAULT 'NEW', -- NEW, ACCEPTED, PREPARING, READY, SERVED, COMPLETED, CANCELLED
     `notes` VARCHAR(255),
     `order_time` DATETIME NULL,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` DATETIME NULL,
     CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_order_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 13. ORDER ITEMS
 CREATE TABLE `order_items` (
@@ -179,7 +179,7 @@ CREATE TABLE `order_items` (
     `notes` VARCHAR(255),
     CONSTRAINT `fk_oi_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_oi_menu` FOREIGN KEY (`menu_item_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 14. KITCHEN ORDERS
 CREATE TABLE `kitchen_orders` (
@@ -190,7 +190,7 @@ CREATE TABLE `kitchen_orders` (
     `started_at` DATETIME NULL,
     `completed_at` DATETIME NULL,
     CONSTRAINT `fk_ko_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 15. COUPONS
 CREATE TABLE `coupons` (
@@ -204,7 +204,7 @@ CREATE TABLE `coupons` (
     `valid_until` DATE NOT NULL,
     `active` BOOLEAN DEFAULT TRUE,
     `created_at` DATETIME NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 16. INVOICES
 CREATE TABLE `invoices` (
@@ -219,7 +219,7 @@ CREATE TABLE `invoices` (
     `pdf_url` VARCHAR(500),
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_inv_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 17. PAYMENTS
 CREATE TABLE `payments` (
@@ -230,7 +230,7 @@ CREATE TABLE `payments` (
     `payment_status` VARCHAR(20) NOT NULL DEFAULT 'COMPLETED', -- PENDING, COMPLETED, FAILED
     `paid_at` DATETIME NULL,
     CONSTRAINT `fk_pay_invoice` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 18. INVENTORY
 CREATE TABLE `inventory` (
@@ -240,8 +240,8 @@ CREATE TABLE `inventory` (
     `current_stock` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `min_required_stock` DECIMAL(10, 2) NOT NULL DEFAULT 5.00,
     `cost_per_unit` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `updated_at` DATETIME NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 19. STOCK HISTORY
 CREATE TABLE `stock_history` (
@@ -252,7 +252,7 @@ CREATE TABLE `stock_history` (
     `notes` VARCHAR(255),
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_sh_inventory` FOREIGN KEY (`inventory_id`) REFERENCES `inventory` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 20. NOTIFICATIONS
 CREATE TABLE `notifications` (
@@ -264,7 +264,7 @@ CREATE TABLE `notifications` (
     `table_id` BIGINT,
     `is_read` BOOLEAN DEFAULT FALSE,
     `created_at` DATETIME NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 21. AUDIT LOGS
 CREATE TABLE `audit_logs` (
@@ -276,7 +276,7 @@ CREATE TABLE `audit_logs` (
     `details` TEXT,
     `ip_address` VARCHAR(50),
     `timestamp` DATETIME NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- INDEXES FOR HIGH PERFORMANCE QUERYING
 CREATE INDEX idx_orders_status ON orders(status);
