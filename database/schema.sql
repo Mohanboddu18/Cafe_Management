@@ -46,8 +46,8 @@ CREATE TABLE `users` (
     `phone` VARCHAR(20),
     `role_id` BIGINT NOT NULL,
     `status` VARCHAR(20) DEFAULT 'ACTIVE',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -75,8 +75,8 @@ CREATE TABLE `restaurant_tables` (
     `status` VARCHAR(30) DEFAULT 'AVAILABLE', -- AVAILABLE, OCCUPIED, BILL_REQUESTED, RESERVED, CLEANING
     `qr_code_url` VARCHAR(500),
     `qr_token` VARCHAR(100) UNIQUE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    `created_at` DATETIME NULL,
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 6. QR CODES
@@ -85,7 +85,7 @@ CREATE TABLE `qr_codes` (
     `table_id` BIGINT NOT NULL UNIQUE,
     `qr_data` VARCHAR(500) NOT NULL,
     `image_base64` LONGTEXT,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
     CONSTRAINT `fk_qr_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -97,7 +97,7 @@ CREATE TABLE `categories` (
     `image_url` VARCHAR(500),
     `display_order` INT DEFAULT 0,
     `active` BOOLEAN DEFAULT TRUE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `created_at` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 8. MENU ITEMS
@@ -112,8 +112,8 @@ CREATE TABLE `menu_items` (
     `is_veg` BOOLEAN DEFAULT TRUE,
     `is_available` BOOLEAN DEFAULT TRUE,
     `is_featured` BOOLEAN DEFAULT FALSE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_menu_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -124,7 +124,7 @@ CREATE TABLE `customers` (
     `name` VARCHAR(100),
     `phone` VARCHAR(20),
     `table_id` BIGINT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
     CONSTRAINT `fk_customer_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -133,8 +133,8 @@ CREATE TABLE `cart` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `session_id` VARCHAR(100) NOT NULL UNIQUE,
     `table_id` BIGINT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_cart_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -161,8 +161,8 @@ CREATE TABLE `orders` (
     `net_amount` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `status` VARCHAR(30) NOT NULL DEFAULT 'NEW', -- NEW, ACCEPTED, PREPARING, READY, SERVED, COMPLETED, CANCELLED
     `notes` VARCHAR(255),
-    `order_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `order_time` DATETIME NULL,
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_order_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -187,8 +187,8 @@ CREATE TABLE `kitchen_orders` (
     `order_id` BIGINT NOT NULL UNIQUE,
     `kitchen_status` VARCHAR(30) DEFAULT 'QUEUED', -- QUEUED, PREPARING, READY, COMPLETED
     `estimated_prep_time` INT DEFAULT 15,
-    `started_at` TIMESTAMP NULL,
-    `completed_at` TIMESTAMP NULL,
+    `started_at` DATETIME NULL,
+    `completed_at` DATETIME NULL,
     CONSTRAINT `fk_ko_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -203,7 +203,7 @@ CREATE TABLE `coupons` (
     `max_discount` DECIMAL(10, 2) DEFAULT 0.00,
     `valid_until` DATE NOT NULL,
     `active` BOOLEAN DEFAULT TRUE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `created_at` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 16. INVOICES
@@ -217,7 +217,7 @@ CREATE TABLE `invoices` (
     `gst_amount` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `total_payable` DECIMAL(10, 2) NOT NULL,
     `pdf_url` VARCHAR(500),
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
     CONSTRAINT `fk_inv_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -228,7 +228,7 @@ CREATE TABLE `payments` (
     `payment_method` VARCHAR(30) NOT NULL, -- CASH, CARD, UPI
     `transaction_ref` VARCHAR(100),
     `payment_status` VARCHAR(20) NOT NULL DEFAULT 'COMPLETED', -- PENDING, COMPLETED, FAILED
-    `paid_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `paid_at` DATETIME NULL,
     CONSTRAINT `fk_pay_invoice` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -240,7 +240,7 @@ CREATE TABLE `inventory` (
     `current_stock` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `min_required_stock` DECIMAL(10, 2) NOT NULL DEFAULT 5.00,
     `cost_per_unit` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 19. STOCK HISTORY
@@ -250,7 +250,7 @@ CREATE TABLE `stock_history` (
     `transaction_type` VARCHAR(20) NOT NULL, -- IN, OUT, ADJUSTMENT
     `quantity` DECIMAL(10, 2) NOT NULL,
     `notes` VARCHAR(255),
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME NULL,
     CONSTRAINT `fk_sh_inventory` FOREIGN KEY (`inventory_id`) REFERENCES `inventory` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -263,7 +263,7 @@ CREATE TABLE `notifications` (
     `order_id` BIGINT,
     `table_id` BIGINT,
     `is_read` BOOLEAN DEFAULT FALSE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `created_at` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 21. AUDIT LOGS
@@ -275,7 +275,7 @@ CREATE TABLE `audit_logs` (
     `target_entity` VARCHAR(100),
     `details` TEXT,
     `ip_address` VARCHAR(50),
-    `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `timestamp` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- INDEXES FOR HIGH PERFORMANCE QUERYING
