@@ -59,6 +59,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/", "/index.html", "/*.js", "/*.css", "/*.ico", "/*.png", "/*.jpg", "/*.svg", "/*.woff*", "/assets/**", "/customer/**", "/login", "/admin/**", "/waiter/**", "/kitchen/**", "/cashier/**", "/error", "/health", "/api/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/customer/**").permitAll()
+                        .requestMatchers("/api/cashier/**").permitAll()
                         .requestMatchers("/api/reviews/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**").permitAll()
@@ -66,7 +67,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/kitchen/**").hasAnyRole("ADMIN", "KITCHEN")
                         .requestMatchers("/api/waiter/**").hasAnyRole("ADMIN", "WAITER")
-                        .requestMatchers("/api/cashier/**").hasAnyRole("ADMIN", "CASHIER")
                         .anyRequest().authenticated()
                 );
 

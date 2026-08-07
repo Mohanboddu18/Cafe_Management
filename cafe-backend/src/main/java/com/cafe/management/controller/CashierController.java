@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/cashier")
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('CASHIER', 'ADMIN')")
 public class CashierController {
 
     @Autowired
