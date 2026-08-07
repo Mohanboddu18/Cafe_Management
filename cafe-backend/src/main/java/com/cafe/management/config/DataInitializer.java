@@ -82,65 +82,71 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println(">>> [DataInitializer] Seeded 8 restaurant tables.");
         }
 
-        // 5. Seed Categories & Menu Items if empty
+        // 5. Seed / Ensure Categories & Menu Items ONLY if empty
         if (categoryRepository.count() == 0) {
-            System.out.println(">>> [DataInitializer] Seeding categories and menu items...");
+            System.out.println(">>> [DataInitializer] Seeding initial categories and menu items...");
 
-            Category cat1 = categoryRepository.save(Category.builder()
-                    .name("Espresso & Coffee")
-                    .description("Freshly roasted single-origin espresso and handcrafted coffee specialties")
-                    .imageUrl("https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(1).active(true).build());
+            Category cat1 = createOrUpdateCategory("Espresso & Coffee", "Freshly roasted single-origin espresso and handcrafted coffee specialties", "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80", 1);
+            Category cat2 = createOrUpdateCategory("Tea & Cold Drinks", "Organic herbal teas, iced brews, fresh juices, and smoothies", "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80", 2);
+            Category cat3 = createOrUpdateCategory("Artisanal Bakery & Toast", "Freshly baked sourdough, croissants, and gourmet avocado toasts", "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80", 3);
+            Category cat4 = createOrUpdateCategory("Breakfast & Egg Specialties", "Fluffy buttermilk pancakes, Benedicts, and gourmet egg bowls", "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80", 4);
+            Category cat5 = createOrUpdateCategory("Gourmet Sandwiches & Burgers", "Brioche burgers, artisan paninis, and wholesome wraps", "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80", 5);
+            Category cat6 = createOrUpdateCategory("Artisanal Wood-Fired Pizzas", "Hand-tossed sourdough pizzas with premium toppings", "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80", 6);
+            Category cat7 = createOrUpdateCategory("Authentic Shawarmas & Wraps", "Middle Eastern grilled shawarmas and spiced wraps", "https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&w=600&q=80", 7);
+            Category cat8 = createOrUpdateCategory("Mocktails & Mixology", "Handcrafted non-alcoholic cocktails & sparkling coolers", "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80", 8);
+            Category cat9 = createOrUpdateCategory("Fresh Fruit Juices & Cool Drinks", "100% cold-pressed juices and chilled refreshing drinks", "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80", 9);
+            Category cat10 = createOrUpdateCategory("Desserts & Sweets", "Decadent mousse, tarts, and handcrafted gelato", "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80", 10);
 
-            Category cat2 = categoryRepository.save(Category.builder()
-                    .name("Tea & Cold Drinks")
-                    .description("Organic herbal teas, iced brews, fresh juices, and smoothies")
-                    .imageUrl("https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(2).active(true).build());
+            // 1. Espresso & Coffee Items
+            createOrUpdateMenuItem(cat1, "Classic Double Espresso", "Rich 100% Arabica double shot with velvety crema", new BigDecimal("3.50"), "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80", 5, true, true, true, 4.8, 12);
+            createOrUpdateMenuItem(cat1, "Caramel Cloud Cappuccino", "Espresso steamed milk topped with salted caramel foam", new BigDecimal("4.90"), "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80", 7, true, true, true, 4.9, 25);
+            createOrUpdateMenuItem(cat1, "Iced Vanilla Bean Latte", "Cold brewed espresso with Madagascar vanilla bean syrup and oat milk", new BigDecimal("5.50"), "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=600&q=80", 6, true, true, false, 4.7, 18);
 
-            Category cat3 = categoryRepository.save(Category.builder()
-                    .name("Artisanal Bakery & Toast")
-                    .description("Freshly baked sourdough, croissants, and gourmet avocado toasts")
-                    .imageUrl("https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(3).active(true).build());
+            // 2. Tea & Cold Drinks
+            createOrUpdateMenuItem(cat2, "Japanese Iced Matcha Latte", "Ceremonial grade Uji matcha whisked with almond milk and honey", new BigDecimal("5.80"), "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80", 6, true, true, true, 4.9, 30);
+            createOrUpdateMenuItem(cat2, "Fresh Passion Fruit Lemonade", "Squeezed lemons infused with natural passion fruit nectar", new BigDecimal("4.20"), "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80", 5, true, true, false, 4.6, 15);
 
-            Category cat4 = categoryRepository.save(Category.builder()
-                    .name("Breakfast & Pancakes")
-                    .description("Fluffy buttermilk pancakes, Benedicts, and morning bowls")
-                    .imageUrl("https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(4).active(true).build());
+            // 3. Bakery & Toast
+            createOrUpdateMenuItem(cat3, "Sourdough Avocado Toast", "Smashed Hass avocado, poached egg, cherry tomatoes & feta crumble", new BigDecimal("9.50"), "https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?auto=format&fit=crop&w=600&q=80", 12, true, true, true, 4.8, 22);
+            createOrUpdateMenuItem(cat3, "Butter Almond Croissant", "Flaky French butter pastry filled with toasted almond cream", new BigDecimal("4.50"), "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80", 5, true, true, false, 4.7, 19);
 
-            Category cat5 = categoryRepository.save(Category.builder()
-                    .name("Gourmet Sandwiches & Burgers")
-                    .description("Brioche burgers, artisan paninis, and wholesome wraps")
-                    .imageUrl("https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(5).active(true).build());
+            // 4. Breakfast & Egg Specialties
+            createOrUpdateMenuItem(cat4, "Blueberry Maple Pancake Stack", "Fluffy triple-stacked pancakes with wild blueberry compote and warm maple syrup", new BigDecimal("10.90"), "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80", 15, true, true, true, 5.0, 35);
+            createOrUpdateMenuItem(cat4, "Truffle Scrambled Eggs on Sourdough", "Creamy organic scrambled eggs infused with black truffle oil on toasted sourdough", new BigDecimal("11.50"), "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80", 10, false, true, true, 4.9, 20);
+            createOrUpdateMenuItem(cat4, "Classic Eggs Benedict with Smoked Turkey", "Poached eggs, smoked turkey slice & hollandaise sauce on English muffin", new BigDecimal("13.20"), "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=600&q=80", 12, false, true, false, 4.8, 14);
+            createOrUpdateMenuItem(cat4, "Cheese & Herb Omelette", "Three-egg fluffy omelette packed with sharp cheddar, mozzarella, and fresh herbs", new BigDecimal("9.80"), "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=600&q=80", 10, false, true, false, 4.7, 16);
 
-            Category cat6 = categoryRepository.save(Category.builder()
-                    .name("Desserts & Sweets")
-                    .description("Decadent mousse, tarts, and handcrafted gelato")
-                    .imageUrl("https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80")
-                    .displayOrder(6).active(true).build());
+            // 5. Gourmet Burgers
+            createOrUpdateMenuItem(cat5, "Truffle Mushroom Angus Burger", "100% Angus beef patty, Swiss cheese, sauteed mushrooms & truffle aioli", new BigDecimal("14.50"), "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80", 18, false, true, true, 4.9, 40);
+            createOrUpdateMenuItem(cat5, "Crispy Fiery Chicken Burger", "Spicy buttermilk fried chicken breast, coleslaw & jalapeno mayo on brioche", new BigDecimal("12.90"), "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=600&q=80", 15, false, true, true, 4.8, 28);
+            createOrUpdateMenuItem(cat5, "Double Cheese Smash Burger", "Two seared beef patties, American cheese, caramelized onions & secret sauce", new BigDecimal("13.80"), "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=600&q=80", 14, false, true, false, 4.9, 32);
+            createOrUpdateMenuItem(cat5, "Classic Veggie Loaded Burger", "Crispy spiced potato & corn patty with cheddar cheese & herb mayo", new BigDecimal("10.50"), "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80", 12, true, true, false, 4.6, 18);
 
-            // Menu Items
-            menuItemRepository.save(MenuItem.builder().category(cat1).name("Classic Double Espresso").description("Rich 100% Arabica double shot with velvety crema").price(new BigDecimal("3.50")).imageUrl("https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80").prepTimeMins(5).isVeg(true).isAvailable(true).isFeatured(true).averageRating(4.8).totalRatings(12).build());
-            menuItemRepository.save(MenuItem.builder().category(cat1).name("Caramel Cloud Cappuccino").description("Espresso steamed milk topped with salted caramel foam").price(new BigDecimal("4.90")).imageUrl("https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80").prepTimeMins(7).isVeg(true).isAvailable(true).isFeatured(true).averageRating(4.9).totalRatings(25).build());
-            menuItemRepository.save(MenuItem.builder().category(cat1).name("Iced Vanilla Bean Latte").description("Cold brewed espresso with Madagascar vanilla bean syrup and oat milk").price(new BigDecimal("5.50")).imageUrl("https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=600&q=80").prepTimeMins(6).isVeg(true).isAvailable(true).isFeatured(false).averageRating(4.7).totalRatings(18).build());
+            // 6. Artisanal Wood-Fired Pizzas
+            createOrUpdateMenuItem(cat6, "Artisan Margherita Pizza", "Wood-fired sourdough base with San Marzano tomato sauce, fresh mozzarella & basil", new BigDecimal("12.50"), "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80", 15, true, true, true, 4.9, 45);
+            createOrUpdateMenuItem(cat6, "Spicy Pepperoni Feast Pizza", "Crispy wood-fired crust loaded with Italian pepperoni, mozzarella & chili flakes", new BigDecimal("15.90"), "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80", 16, false, true, true, 4.9, 50);
+            createOrUpdateMenuItem(cat6, "Truffle Mushroom & Spinach Pizza", "Roasted wild mushrooms, ricotta cheese, truffle drizzle & fresh baby spinach", new BigDecimal("14.80"), "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80", 15, true, true, false, 4.8, 22);
+            createOrUpdateMenuItem(cat6, "BBQ Loaded Chicken Pizza", "Smoky BBQ chicken, red onions, bell peppers & cilantro on mozzarella base", new BigDecimal("15.20"), "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80", 16, false, true, true, 4.9, 38);
 
-            menuItemRepository.save(MenuItem.builder().category(cat2).name("Japanese Iced Matcha Latte").description("Ceremonial grade Uji matcha whisked with almond milk and honey").price(new BigDecimal("5.80")).imageUrl("https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80").prepTimeMins(6).isVeg(true).isAvailable(true).isFeatured(true).averageRating(4.9).totalRatings(30).build());
-            menuItemRepository.save(MenuItem.builder().category(cat2).name("Fresh Passion Fruit Lemonade").description("Squeezed lemons infused with natural passion fruit nectar").price(new BigDecimal("4.20")).imageUrl("https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80").prepTimeMins(5).isVeg(true).isAvailable(true).isFeatured(false).averageRating(4.6).totalRatings(15).build());
+            // 7. Authentic Shawarmas & Wraps
+            createOrUpdateMenuItem(cat7, "Classic Lebanese Chicken Shawarma", "Slow-roasted chicken shawarma, garlic toum, pickles & crispy fries wrapped in pita", new BigDecimal("9.90"), "https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&w=600&q=80", 10, false, true, true, 4.9, 42);
+            createOrUpdateMenuItem(cat7, "Spicy Lamb Shawarma Roll", "Tender spiced lamb strips, tahini, sumac onions & fresh parsley in saj bread", new BigDecimal("12.50"), "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&w=600&q=80", 12, false, true, true, 4.8, 27);
+            createOrUpdateMenuItem(cat7, "Grilled Paneer Tikka Shawarma", "Char-grilled spiced cottage cheese, mint yogurt sauce & crunchy veggies in flatbread", new BigDecimal("8.90"), "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80", 10, true, true, false, 4.7, 16);
 
-            menuItemRepository.save(MenuItem.builder().category(cat3).name("Sourdough Avocado Toast").description("Smashed Hass avocado, poached egg, cherry tomatoes & feta crumble").price(new BigDecimal("9.50")).imageUrl("https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?auto=format&fit=crop&w=600&q=80").prepTimeMins(12).isVeg(true).isAvailable(true).isFeatured(true).averageRating(4.8).totalRatings(22).build());
-            menuItemRepository.save(MenuItem.builder().category(cat3).name("Butter Almond Croissant").description("Flaky French butter pastry filled with toasted almond cream").price(new BigDecimal("4.50")).imageUrl("https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80").prepTimeMins(5).isVeg(true).isAvailable(true).isFeatured(false).averageRating(4.7).totalRatings(19).build());
+            // 8. Mocktails & Mixology
+            createOrUpdateMenuItem(cat8, "Virgin Blue Ocean Mojito", "Blue curacao, muddled fresh mint, lime juice & sparkling soda on ice", new BigDecimal("6.50"), "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80", 5, true, true, true, 4.9, 35);
+            createOrUpdateMenuItem(cat8, "Watermelon Mint Cooler", "Fresh crushed watermelon, cooling mint leaves & lemon twist sparkler", new BigDecimal("5.90"), "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80", 5, true, true, true, 4.8, 29);
+            createOrUpdateMenuItem(cat8, "Tropical Passion Fruit Sparkler", "Exotic passion fruit nectar, pineapple juice & sparkling tonic water", new BigDecimal("6.20"), "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80", 5, true, true, false, 4.7, 21);
 
-            menuItemRepository.save(MenuItem.builder().category(cat4).name("Blueberry Maple Pancake Stack").description("Fluffy triple-stacked pancakes with wild blueberry compote and warm maple syrup").price(new BigDecimal("10.90")).imageUrl("https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80").prepTimeMins(15).isVeg(true).isAvailable(true).isFeatured(true).averageRating(5.0).totalRatings(35).build());
+            // 9. Fresh Fruit Juices & Cool Drinks
+            createOrUpdateMenuItem(cat9, "Cold-Pressed Valencia Orange Juice", "100% pure freshly squeezed orange juice packed with natural Vitamin C", new BigDecimal("4.80"), "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=600&q=80", 4, true, true, true, 4.9, 31);
+            createOrUpdateMenuItem(cat9, "Detox Green Apple & Ginger Juice", "Crisp green apple, cucumber, celery & fresh ginger root extract", new BigDecimal("5.20"), "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=600&q=80", 5, true, true, false, 4.6, 17);
+            createOrUpdateMenuItem(cat9, "Chilled Ice Cold Cola", "Refreshing classic carbonated cola served with fresh ice & lemon wedge", new BigDecimal("2.50"), "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80", 2, true, true, false, 4.7, 50);
 
-            menuItemRepository.save(MenuItem.builder().category(cat5).name("Truffle Mushroom Angus Burger").description("100% Angus beef patty, Swiss cheese, sauteed mushrooms & truffle aioli").price(new BigDecimal("14.50")).imageUrl("https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80").prepTimeMins(18).isVeg(false).isAvailable(true).isFeatured(true).averageRating(4.9).totalRatings(40).build());
-            menuItemRepository.save(MenuItem.builder().category(cat5).name("Crispy Paneer Tikka Wrap").description("Grilled marinated cottage cheese, crunchy greens & mint chutney wrap").price(new BigDecimal("11.20")).imageUrl("https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=600&q=80").prepTimeMins(14).isVeg(true).isAvailable(true).isFeatured(false).averageRating(4.8).totalRatings(16).build());
+            // 10. Desserts & Sweets
+            createOrUpdateMenuItem(cat10, "Belgian Chocolate Lava Cake", "Warm molten chocolate cake served with Madagascar vanilla gelato", new BigDecimal("7.50"), "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80", 10, true, true, true, 4.9, 28);
 
-            menuItemRepository.save(MenuItem.builder().category(cat6).name("Belgian Chocolate Lava Cake").description("Warm molten chocolate cake served with Madagascar vanilla gelato").price(new BigDecimal("7.50")).imageUrl("https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80").prepTimeMins(10).isVeg(true).isAvailable(true).isFeatured(true).averageRating(4.9).totalRatings(28).build());
-
-            System.out.println(">>> [DataInitializer] Seeded categories and menu items.");
+            System.out.println(">>> [DataInitializer] Seeded initial categories and menu items successfully!");
         }
 
         // 6. Seed Coupons if empty
@@ -167,6 +173,36 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
+    private Category createOrUpdateCategory(String name, String description, String imageUrl, int displayOrder) {
+        return categoryRepository.findByName(name).orElseGet(() ->
+                categoryRepository.save(Category.builder()
+                        .name(name)
+                        .description(description)
+                        .imageUrl(imageUrl)
+                        .displayOrder(displayOrder)
+                        .active(true)
+                        .build())
+        );
+    }
+
+    private MenuItem createOrUpdateMenuItem(Category category, String name, String description, BigDecimal price, String imageUrl, int prepTimeMins, boolean isVeg, boolean isAvailable, boolean isFeatured, double avgRating, int totalRatings) {
+        return menuItemRepository.findByName(name).orElseGet(() ->
+                menuItemRepository.save(MenuItem.builder()
+                        .category(category)
+                        .name(name)
+                        .description(description)
+                        .price(price)
+                        .imageUrl(imageUrl)
+                        .prepTimeMins(prepTimeMins)
+                        .isVeg(isVeg)
+                        .isAvailable(isAvailable)
+                        .isFeatured(isFeatured)
+                        .averageRating(avgRating)
+                        .totalRatings(totalRatings)
+                        .build())
+        );
+    }
+
     private void createOrUpdateUser(String username, String rawPassword, String email, String fullName, Role role) {
         User user = userRepository.findByUsername(username).orElseGet(() ->
                 User.builder()
@@ -185,4 +221,5 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println(">>> [DataInitializer] User '" + username + "' password updated for login (" + rawPassword + ")");
     }
 }
+
 
