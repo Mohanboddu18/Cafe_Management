@@ -87,7 +87,7 @@ import { Subscription, interval } from 'rxjs';
                      class="img-fluid rounded-3 mb-2 p-2 bg-white border shadow-sm" 
                      style="max-height: 180px;" 
                      [alt]="'Table ' + tbl.tableNumber + ' QR Code'">
-                <div class="extra-small text-muted font-monospace text-truncate">http://localhost:4200/customer/menu?table={{ tbl.tableNumber }}</div>
+                <div class="extra-small text-muted font-monospace text-truncate">{{ getMenuUrl(tbl) }}</div>
               </div>
             </div>
 
@@ -175,9 +175,16 @@ export class TableSelectionComponent implements OnInit, OnDestroy {
     });
   }
 
+  getMenuUrl(table: RestaurantTable): string {
+    const origin = (typeof window !== 'undefined' && window.location && window.location.origin) 
+      ? window.location.origin 
+      : 'https://cafe-management-zjf6.onrender.com';
+    return `${origin}/customer/menu?table=${table.tableNumber}`;
+  }
+
   getQrImageUrl(table: RestaurantTable): string {
-    const targetUrl = encodeURIComponent(`http://localhost:4200/customer/menu?table=${table.tableNumber}`);
-    return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${targetUrl}`;
+    const targetUrl = encodeURIComponent(this.getMenuUrl(table));
+    return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${targetUrl}&color=1a-1a-1a`;
   }
 
   selectAvailableTable(table: RestaurantTable): void {
