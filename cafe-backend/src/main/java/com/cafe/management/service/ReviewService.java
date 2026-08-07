@@ -54,7 +54,12 @@ public class ReviewService {
                     .rating(itemRating.getRating())
                     .comment(itemRating.getComment())
                     .customerName(custName)
+                    .createdAt(LocalDateTime.now())
                     .build();
+
+            if (review.getCreatedAt() == null) {
+                review.setCreatedAt(LocalDateTime.now());
+            }
 
             savedReviews.add(reviewRepository.save(review));
 
@@ -74,12 +79,12 @@ public class ReviewService {
         return savedReviews.stream()
                 .map(r -> ReviewResponse.builder()
                         .id(r.getId())
-                        .menuItemId(r.getMenuItem().getId())
-                        .menuItemName(r.getMenuItem().getName())
+                        .menuItemId(r.getMenuItem() != null ? r.getMenuItem().getId() : null)
+                        .menuItemName(r.getMenuItem() != null ? r.getMenuItem().getName() : "Item")
                         .rating(r.getRating())
                         .comment(r.getComment())
                         .customerName(r.getCustomerName())
-                        .createdAt(r.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                        .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -88,12 +93,12 @@ public class ReviewService {
         return reviewRepository.findByMenuItemIdOrderByCreatedAtDesc(menuItemId).stream()
                 .map(r -> ReviewResponse.builder()
                         .id(r.getId())
-                        .menuItemId(r.getMenuItem().getId())
-                        .menuItemName(r.getMenuItem().getName())
+                        .menuItemId(r.getMenuItem() != null ? r.getMenuItem().getId() : null)
+                        .menuItemName(r.getMenuItem() != null ? r.getMenuItem().getName() : "Item")
                         .rating(r.getRating())
                         .comment(r.getComment())
                         .customerName(r.getCustomerName())
-                        .createdAt(r.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                        .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
                         .build())
                 .collect(Collectors.toList());
     }
