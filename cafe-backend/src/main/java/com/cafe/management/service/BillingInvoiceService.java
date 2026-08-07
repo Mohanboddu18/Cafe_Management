@@ -175,6 +175,7 @@ public class BillingInvoiceService {
         order.setStatus("BILL_REQUESTED");
         orderRepository.save(order);
 
+        final BigDecimal finalDiscount = discountAmount;
         Invoice invoice = invoiceRepository.findByOrderId(order.getId())
                 .orElseGet(() -> Invoice.builder()
                         .invoiceNumber("INV-" + System.currentTimeMillis() % 1000000)
@@ -339,6 +340,7 @@ public class BillingInvoiceService {
                     .setMarginBottom(4));
 
             // Metadata Table
+            Table metaTable = new Table(UnitValue.createPercentArray(new float[]{50, 50})).useAllAvailableWidth();
             LocalDateTime invDate = invoice.getCreatedAt() != null ? invoice.getCreatedAt() : LocalDateTime.now();
             metaTable.addCell(new Cell().add(new Paragraph("Inv #: " + invoice.getInvoiceNumber()).setFontSize(8).setBold()).setBorder(null));
             metaTable.addCell(new Cell().add(new Paragraph("Date: " + invDate.format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"))).setFontSize(8).setTextAlignment(TextAlignment.RIGHT)).setBorder(null));
