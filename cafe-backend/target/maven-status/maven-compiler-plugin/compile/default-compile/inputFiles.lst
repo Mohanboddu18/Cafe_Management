@@ -22,6 +22,7 @@ C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\co
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\config\SecurityConfig.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\dto\ReviewDTOs.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\entity\MenuItem.java
+C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\InitOnlineDb.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\service\NotificationService.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\dto\AuthDTOs.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\service\OrderService.java
@@ -73,7 +74,6 @@ C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\re
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\entity\Invoice.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\service\TableQrService.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\dto\AnalyticsDTOs.java
-C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\DbTester.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\entity\Coupon.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\repository\OrderItemRepository.java
 C:\Users\mohan\Cafe Management\cafe-backend\src\main\java\com\cafe\management\entity\StockHistory.java
