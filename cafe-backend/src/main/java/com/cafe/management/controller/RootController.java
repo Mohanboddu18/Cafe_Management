@@ -83,4 +83,9 @@ public class RootController {
         resp.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(resp);
     }
+
+    @GetMapping("favicon.ico")
+    public ResponseEntity<Void> favicon() {
+        return ResponseEntity.noContent().build();
+    }
 }
