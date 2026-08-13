@@ -6,3 +6,4 @@ node_modules/
 .angular/
 cafe-frontend/.angular/
 cafe-frontend/node_modules/
+.env

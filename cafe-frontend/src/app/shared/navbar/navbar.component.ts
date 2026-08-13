@@ -13,7 +13,7 @@ import { User } from '../../core/models/cafe.models';
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
           <i class="fa-solid fa-mug-hot text-warning fs-3"></i>
-          <span class="font-serif fw-bold fs-4 text-white">Artisanal Cafe</span>
+          <span class="font-serif fw-bold fs-4 text-white">{{ brandTitle }}</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
@@ -84,6 +84,41 @@ export class NavbarComponent {
 
   get isCustomerPage(): boolean {
     return this.router.url.startsWith('/customer') || this.router.url === '/';
+  }
+
+  get brandTitle(): string {
+    const url = this.router.url;
+    let tableNum: string | null = null;
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      tableNum = urlParams.get('table') || sessionStorage.getItem('current_table_number') || localStorage.getItem('cafe_customer_table');
+    }
+
+    if (url.includes('/cashier/billing')) {
+      return 'Artisanal Cafe - Cashier';
+    }
+    if (url.includes('/waiter/dashboard')) {
+      return 'Artisanal Cafe - Waiter';
+    }
+    if (url.includes('/kitchen/dashboard')) {
+      return 'Artisanal Cafe - Kitchen';
+    }
+    if (url.includes('/admin/dashboard')) {
+      return 'Artisanal Cafe - Admin';
+    }
+    if (url.includes('/customer/menu')) {
+      return tableNum ? `Table #${tableNum} - Menu` : 'Artisanal Cafe - Menu';
+    }
+    if (url.includes('/customer/tracking')) {
+      return tableNum ? `Table #${tableNum} - Order Tracking` : 'Artisanal Cafe - Order Tracking';
+    }
+    if (url.includes('/customer/tables')) {
+      return 'Artisanal Cafe - Select Table';
+    }
+    if (url.includes('/login')) {
+      return 'Artisanal Cafe - Staff Login';
+    }
+    return 'Artisanal Cafe & Bistro';
   }
 
   logout(): void {

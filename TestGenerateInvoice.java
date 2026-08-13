@@ -9,9 +9,12 @@ import java.time.LocalDateTime;
 
 public class TestGenerateInvoice {
     public static void main(String[] args) {
-        String url = "jdbc:mysql://sql12.freesqldatabase.com:3306/sql12834862?useSSL=false&allowPublicKeyRetrieval=true";
-        String user = "sql12834862";
-        String pass = "y7ecySmrmQ";
+        String host = System.getenv().getOrDefault("DB_HOST", "localhost");
+        String port = System.getenv().getOrDefault("DB_PORT", "3306");
+        String dbName = System.getenv().getOrDefault("DB_NAME", "defaultdb");
+        String user = System.getenv().getOrDefault("DB_USERNAME", "avnadmin");
+        String pass = System.getenv().getOrDefault("DB_PASSWORD", "");
+        String url = System.getenv().getOrDefault("DB_URL", "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useSSL=true&verifyServerCertificate=false&allowPublicKeyRetrieval=true");
 
         try (Connection conn = DriverManager.getConnection(url, user, pass)) {
             System.out.println("Connected to MySQL online database!");

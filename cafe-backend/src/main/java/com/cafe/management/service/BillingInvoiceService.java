@@ -225,9 +225,9 @@ public class BillingInvoiceService {
         try {
             String tableNum = (order.getTable() != null) ? String.valueOf(order.getTable().getTableNumber()) : "N/A";
             Long tableId = (order.getTable() != null) ? order.getTable().getId() : null;
-            String billMsg = "Bill Invoice generated for Table #" + tableNum + " (Total: ₹" + totalPayable + "). Customer can now pay via UPI, Card, or Cash.";
-            notificationService.sendNotification("WAITER", "📄 Bill Invoice Generated", billMsg, order.getId(), tableId);
-            notificationService.sendNotification("CASHIER", "📄 Bill Invoice Generated", billMsg, order.getId(), tableId);
+            String billMsg = "Bill Invoice generated for Table #" + tableNum + " (Total: Rs." + totalPayable + "). Customer can now pay via UPI, Card, or Cash.";
+            notificationService.sendNotification("WAITER", "Bill Invoice Generated", billMsg, order.getId(), tableId);
+            notificationService.sendNotification("CASHIER", "Bill Invoice Generated", billMsg, order.getId(), tableId);
         } catch (Exception notifEx) {
             System.err.println("Notification send failed: " + notifEx.getMessage());
         }
@@ -258,9 +258,9 @@ public class BillingInvoiceService {
 
             try {
                 if (table != null) {
-                    String cashAlertMsg = "💵 CASH PAYMENT ALERT: Table #" + table.getTableNumber() + " selected CASH payment (₹" + invoice.getTotalPayable() + "). Waiter, please collect cash from table and submit to Cashier!";
-                    notificationService.sendNotification("WAITER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
-                    notificationService.sendNotification("CASHIER", "💵 Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
+                    String cashAlertMsg = "CASH PAYMENT ALERT: Table #" + table.getTableNumber() + " selected CASH payment (Rs." + invoice.getTotalPayable() + "). Waiter, please collect cash from table and submit to Cashier!";
+                    notificationService.sendNotification("WAITER", "Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
+                    notificationService.sendNotification("CASHIER", "Cash Payment Requested", cashAlertMsg, order.getId(), table.getId());
                 }
             } catch (Exception notifEx) {
                 System.err.println("Notification error: " + notifEx.getMessage());
@@ -282,9 +282,9 @@ public class BillingInvoiceService {
                 tableRepository.save(table);
 
                 try {
-                    String onlinePayMsg = "✅ Table #" + table.getTableNumber() + " Paid ₹" + invoice.getTotalPayable() + " via " + pMethod + "! Table is now FREE.";
-                    notificationService.sendNotification("WAITER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
-                    notificationService.sendNotification("CASHIER", "✅ Payment Received", onlinePayMsg, order.getId(), table.getId());
+                    String onlinePayMsg = "Table #" + table.getTableNumber() + " Paid Rs." + invoice.getTotalPayable() + " via " + pMethod + "! Table is now FREE.";
+                    notificationService.sendNotification("WAITER", "Payment Received", onlinePayMsg, order.getId(), table.getId());
+                    notificationService.sendNotification("CASHIER", "Payment Received", onlinePayMsg, order.getId(), table.getId());
                 } catch (Exception notifEx) {
                     System.err.println("Notification error: " + notifEx.getMessage());
                 }
@@ -322,9 +322,9 @@ public class BillingInvoiceService {
             tableRepository.save(table);
 
             try {
-                String cashSuccessMsg = "💵 Cash Payment Confirmed for Table #" + table.getTableNumber() + " (₹" + invoice.getTotalPayable() + "). Table is now FREE.";
-                notificationService.sendNotification("WAITER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
-                notificationService.sendNotification("CASHIER", "💵 Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
+                String cashSuccessMsg = "Cash Payment Confirmed for Table #" + table.getTableNumber() + " (Rs." + invoice.getTotalPayable() + "). Table is now FREE.";
+                notificationService.sendNotification("WAITER", "Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
+                notificationService.sendNotification("CASHIER", "Cash Confirmed", cashSuccessMsg, order.getId(), table.getId());
             } catch (Exception notifEx) {
                 System.err.println("Notification error: " + notifEx.getMessage());
             }

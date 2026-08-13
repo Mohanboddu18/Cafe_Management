@@ -229,7 +229,14 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
                  style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%);">
             </div>
             
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 p-2 bg-dark rounded-circle opacity-100 shadow" (click)="closeItemModal()"></button>
+            <!-- Prominent Visible Close Cross Button -->
+            <button type="button" 
+                    class="btn btn-dark text-white rounded-circle position-absolute top-0 end-0 m-3 d-flex align-items-center justify-content-center shadow-lg border border-2 border-white"
+                    style="width: 42px; height: 42px; z-index: 1060; cursor: pointer;"
+                    (click)="closeItemModal()"
+                    aria-label="Close product modal">
+              <i class="fa-solid fa-xmark fs-4"></i>
+            </button>
 
             <!-- Badges overlay -->
             <div class="position-absolute top-0 start-0 m-3 d-flex gap-2 flex-wrap">
@@ -403,7 +410,9 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
             <h5 class="modal-title font-serif fw-bold d-flex align-items-center gap-2">
               <i class="fa-solid fa-right-left text-warning"></i> Switch Your Restaurant Table
             </h5>
-            <button type="button" class="btn-close btn-close-white" (click)="closeSwitchTableModal()"></button>
+            <button type="button" class="btn btn-sm btn-outline-light rounded-circle" (click)="closeSwitchTableModal()" aria-label="Close modal">
+              <i class="fa-solid fa-xmark fs-5"></i>
+            </button>
           </div>
           <div class="modal-body p-4 text-center">
             <div class="mb-4">

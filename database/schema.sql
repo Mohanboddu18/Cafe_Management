@@ -75,6 +75,8 @@ CREATE TABLE `restaurant_tables` (
     `status` VARCHAR(30) DEFAULT 'AVAILABLE', -- AVAILABLE, OCCUPIED, BILL_REQUESTED, RESERVED, CLEANING
     `qr_code_url` VARCHAR(500),
     `qr_token` VARCHAR(100) UNIQUE,
+    `current_token_serial` VARCHAR(50),
+    `current_session_id` VARCHAR(100),
     `created_at` DATETIME NULL,
     `updated_at` DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -112,6 +114,8 @@ CREATE TABLE `menu_items` (
     `is_veg` BOOLEAN DEFAULT TRUE,
     `is_available` BOOLEAN DEFAULT TRUE,
     `is_featured` BOOLEAN DEFAULT FALSE,
+    `average_rating` DOUBLE DEFAULT 4.8,
+    `total_ratings` INT DEFAULT 1,
     `created_at` DATETIME NULL,
     `updated_at` DATETIME NULL,
     CONSTRAINT `fk_menu_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
@@ -123,6 +127,7 @@ CREATE TABLE `customers` (
     `session_id` VARCHAR(100) NOT NULL,
     `name` VARCHAR(100),
     `phone` VARCHAR(20),
+    `customer_token_serial` VARCHAR(50),
     `table_id` BIGINT NOT NULL,
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_customer_table` FOREIGN KEY (`table_id`) REFERENCES `restaurant_tables` (`id`) ON DELETE CASCADE
@@ -217,6 +222,7 @@ CREATE TABLE `invoices` (
     `gst_amount` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `total_payable` DECIMAL(10, 2) NOT NULL,
     `pdf_url` VARCHAR(500),
+    `payment_status` VARCHAR(30) DEFAULT 'PENDING',
     `created_at` DATETIME NULL,
     CONSTRAINT `fk_inv_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -395,3 +401,16 @@ INSERT INTO inventory (id, item_name, unit, current_stock, min_required_stock, c
 (4, 'Fresh Paneer Cubes', 'KG', 20.00, 5.00, 320.00),
 (5, 'Boneless Chicken Breast', 'KG', 30.00, 8.00, 260.00),
 (6, 'Madagascar Vanilla Gelato', 'KG', 15.00, 3.00, 450.00);
+
+-- 22. MENU ITEM REVIEWS
+CREATE TABLE IF NOT EXISTS `menu_item_reviews` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `menu_item_id` BIGINT NOT NULL,
+    `order_id` BIGINT NOT NULL,
+    `rating` INT NOT NULL,
+    `comment` TEXT,
+    `customer_name` VARCHAR(100),
+    `created_at` DATETIME NULL,
+    CONSTRAINT `fk_review_item` FOREIGN KEY (`menu_item_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_review_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

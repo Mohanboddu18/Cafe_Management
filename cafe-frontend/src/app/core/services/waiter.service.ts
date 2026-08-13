@@ -7,7 +7,7 @@ import { RestaurantTable, Order, NotificationMsg } from '../models/cafe.models';
   providedIn: 'root'
 })
 export class WaiterService {
-  private apiUrl = '/api/waiter';
+  private apiUrl = 'http://localhost:8080/api/waiter';
 
   constructor(private http: HttpClient) {}
 

@@ -7,7 +7,7 @@ import { RestaurantTable, Invoice } from '../models/cafe.models';
   providedIn: 'root'
 })
 export class CashierService {
-  private apiUrl = '/api/cashier';
+  private apiUrl = 'http://localhost:8080/api/cashier';
 
   constructor(private http: HttpClient) {}
 

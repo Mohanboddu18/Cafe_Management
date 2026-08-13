@@ -423,6 +423,9 @@ export class OrderTrackingComponent implements OnInit, OnDestroy {
     if (!this.orderId) return;
     this.customerService.getOrderStatus(this.orderId).subscribe(res => {
       this.order = res;
+      if (res && res.tableNumber) {
+        sessionStorage.setItem('current_table_number', res.tableNumber.toString());
+      }
       if (res.status === 'BILL_REQUESTED' || res.status === 'PAID') {
         this.fetchInvoice();
       }
