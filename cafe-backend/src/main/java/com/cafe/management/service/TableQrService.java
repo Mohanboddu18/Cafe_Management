@@ -118,6 +118,12 @@ public class TableQrService {
         if ("AVAILABLE".equalsIgnoreCase(status)) {
             table.setCurrentSessionId(null);
             table.setCurrentTokenSerial(null);
+            // Cancel any lingering active orders when table is cleared to AVAILABLE
+            List<com.cafe.management.entity.Order> activeOrders = orderRepository.findActiveOrdersByTableId(tableId);
+            for (com.cafe.management.entity.Order o : activeOrders) {
+                o.setStatus("CANCELLED");
+                orderRepository.save(o);
+            }
         }
         return tableRepository.save(table);
     }
@@ -137,5 +143,22 @@ public class TableQrService {
             return tableRepository.save(table);
         }
         return table;
+    }
+
+    public RestaurantTable forceResetAndOccupyTable(Long tableId, String sessionId, String customerTokenSerial) {
+        RestaurantTable table = tableRepository.findById(tableId)
+                .orElseThrow(() -> new ResourceNotFoundException("Table not found"));
+        
+        // Cancel any lingering active orders on this table
+        List<com.cafe.management.entity.Order> activeOrders = orderRepository.findActiveOrdersByTableId(tableId);
+        for (com.cafe.management.entity.Order o : activeOrders) {
+            o.setStatus("CANCELLED");
+            orderRepository.save(o);
+        }
+
+        table.setStatus("OCCUPIED");
+        table.setCurrentSessionId(sessionId);
+        table.setCurrentTokenSerial(customerTokenSerial);
+        return tableRepository.save(table);
     }
 }

@@ -70,6 +70,13 @@ export class CustomerService {
     return this.http.post<RestaurantTable>(`${this.apiUrl}/table/${tableId}/occupy`, {}, { params });
   }
 
+  forceResetTable(tableId: number, sessionId?: string, customerTokenSerial?: string): Observable<RestaurantTable> {
+    let params: any = {};
+    if (sessionId) params.sessionId = sessionId;
+    if (customerTokenSerial) params.customerTokenSerial = customerTokenSerial;
+    return this.http.post<RestaurantTable>(`${this.apiUrl}/table/${tableId}/force-reset`, {}, { params });
+  }
+
   switchTable(sessionId: string, fromTableId: number, toTableId: number, customerTokenSerial: string): Observable<Order> {
     return this.http.post<Order>(`${this.apiUrl}/table/switch`, {
       sessionId,

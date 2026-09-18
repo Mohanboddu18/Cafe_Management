@@ -69,7 +69,13 @@ public class DataInitializer implements CommandLineRunner {
         notificationRepository.deleteAll();
         System.out.println(">>> [DataInitializer] Stale notifications purged successfully!");
 
-        // 4. Seed Restaurant Tables if empty, or purge stale occupied locks
+        // 4. Reset all restaurant tables to AVAILABLE and purge any stale active orders
+        List<Order> unclosedOrders = orderRepository.findByStatusIn(Arrays.asList("NEW", "PREPARING", "READY", "SERVED", "BILL_REQUESTED"));
+        for (Order o : unclosedOrders) {
+            o.setStatus("CANCELLED");
+            orderRepository.save(o);
+        }
+
         if (tableRepository.count() == 0) {
             System.out.println(">>> [DataInitializer] Seeding restaurant tables...");
             int[] capacities = {2, 4, 4, 6, 2, 8, 4, 4};
@@ -86,15 +92,12 @@ public class DataInitializer implements CommandLineRunner {
         } else {
             List<RestaurantTable> allTables = tableRepository.findAll();
             for (RestaurantTable t : allTables) {
-                if (("OCCUPIED".equalsIgnoreCase(t.getStatus()) || "BILL_REQUESTED".equalsIgnoreCase(t.getStatus()))
-                        && orderRepository.findActiveOrdersByTableId(t.getId()).isEmpty()) {
-                    t.setStatus("AVAILABLE");
-                    t.setCurrentSessionId(null);
-                    t.setCurrentTokenSerial(null);
-                    tableRepository.save(t);
-                    System.out.println(">>> [DataInitializer] Auto-cleared stale occupied status on Table #" + t.getTableNumber());
-                }
+                t.setStatus("AVAILABLE");
+                t.setCurrentSessionId(null);
+                t.setCurrentTokenSerial(null);
+                tableRepository.save(t);
             }
+            System.out.println(">>> [DataInitializer] All tables reset to AVAILABLE successfully!");
         }
 
         // 5. Seed / Ensure Categories & Menu Items ONLY if empty

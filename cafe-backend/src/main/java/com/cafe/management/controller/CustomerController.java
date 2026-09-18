@@ -121,6 +121,14 @@ public class CustomerController {
         return ResponseEntity.ok(tableQrService.occupyTableWithToken(tableId, sessionId, customerTokenSerial));
     }
 
+    @PostMapping("/table/{tableId}/force-reset")
+    public ResponseEntity<RestaurantTable> forceResetTable(
+            @PathVariable Long tableId,
+            @RequestParam(required = false) String sessionId,
+            @RequestParam(required = false) String customerTokenSerial) {
+        return ResponseEntity.ok(tableQrService.forceResetAndOccupyTable(tableId, sessionId, customerTokenSerial));
+    }
+
     @PostMapping("/table/switch")
     public ResponseEntity<OrderResponse> switchTable(@RequestBody SwitchTableRequest request) {
         return ResponseEntity.ok(orderService.switchTable(request));

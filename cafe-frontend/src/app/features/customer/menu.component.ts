@@ -63,12 +63,17 @@ import { Category, MenuItem, Cart, Order, RestaurantTable } from '../../core/mod
             <i class="fa-solid fa-lock display-5 text-danger"></i>
             <div>
               <h4 class="fw-bold mb-1 text-danger">Table #{{ tableNumber }} is Currently OCCUPIED!</h4>
-              <span class="text-secondary">Another customer is currently dining at this table. Ordering is locked. Please pick a free table to enjoy your meal.</span>
+              <span class="text-secondary">Another customer is currently dining at this table. Ordering is locked.</span>
             </div>
           </div>
-          <a [routerLink]="['/customer/tables']" class="btn btn-danger btn-lg rounded-pill px-4 fw-bold shadow-sm text-nowrap">
-            <i class="fa-solid fa-chair me-2"></i> Pick Available Free Table
-          </a>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-warning text-dark font-monospace fw-bold rounded-pill px-3 shadow-sm" (click)="forceResetTable()">
+              <i class="fa-solid fa-key me-1"></i> Table is Empty? Reset & Unlock Table #{{ tableNumber }}
+            </button>
+            <a [routerLink]="['/customer/tables']" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm text-nowrap">
+              <i class="fa-solid fa-chair me-2"></i> Pick Available Free Table
+            </a>
+          </div>
         </div>
       </div>
 
@@ -613,6 +618,19 @@ export class MenuComponent implements OnInit {
         this.activeOrder = null;
         this.isTableOccupiedByOther = false;
       }
+    });
+  }
+
+  forceResetTable(): void {
+    this.customerService.forceResetTable(this.tableId, this.sessionId, this.customerTokenSerial).subscribe({
+      next: (tbl) => {
+        this.tableStatus = tbl.status;
+        this.isTableOccupiedByOther = false;
+        this.activeOrder = null;
+        this.toastService.show(`Table #${this.tableNumber} unlocked & bound to your token!`, 'success');
+        this.loadCart();
+      },
+      error: () => this.toastService.show('Failed to reset table', 'error')
     });
   }
 
