@@ -70,12 +70,30 @@ public class TableQrService {
     private com.cafe.management.repository.OrderRepository orderRepository;
 
     public List<RestaurantTable> getAllTables() {
-        return tableRepository.findAll();
+        List<RestaurantTable> tables = tableRepository.findAll();
+        for (RestaurantTable table : tables) {
+            if (("OCCUPIED".equalsIgnoreCase(table.getStatus()) || "BILL_REQUESTED".equalsIgnoreCase(table.getStatus()))
+                    && orderRepository.findActiveOrdersByTableId(table.getId()).isEmpty()) {
+                table.setStatus("AVAILABLE");
+                table.setCurrentSessionId(null);
+                table.setCurrentTokenSerial(null);
+                tableRepository.save(table);
+            }
+        }
+        return tables;
     }
 
     public RestaurantTable getTableByNumber(Integer tableNumber) {
-        return tableRepository.findByTableNumber(tableNumber)
+        RestaurantTable table = tableRepository.findByTableNumber(tableNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with table number: " + tableNumber));
+        if (("OCCUPIED".equalsIgnoreCase(table.getStatus()) || "BILL_REQUESTED".equalsIgnoreCase(table.getStatus()))
+                && orderRepository.findActiveOrdersByTableId(table.getId()).isEmpty()) {
+            table.setStatus("AVAILABLE");
+            table.setCurrentSessionId(null);
+            table.setCurrentTokenSerial(null);
+            return tableRepository.save(table);
+        }
+        return table;
     }
 
     public QrCodeEntity getQrCodeByTableId(Long tableId) {
@@ -108,7 +126,11 @@ public class TableQrService {
         RestaurantTable table = tableRepository.findById(tableId)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found"));
         
-        if ("AVAILABLE".equals(table.getStatus()) || (sessionId != null && sessionId.equals(table.getCurrentSessionId())) || (customerTokenSerial != null && customerTokenSerial.equals(table.getCurrentTokenSerial()))) {
+        boolean hasActiveOrders = !orderRepository.findActiveOrdersByTableId(tableId).isEmpty();
+        
+        if (!hasActiveOrders || "AVAILABLE".equalsIgnoreCase(table.getStatus()) 
+                || (sessionId != null && sessionId.equals(table.getCurrentSessionId())) 
+                || (customerTokenSerial != null && customerTokenSerial.equals(table.getCurrentTokenSerial()))) {
             table.setCurrentSessionId(sessionId);
             table.setCurrentTokenSerial(customerTokenSerial);
             table.setStatus("OCCUPIED");

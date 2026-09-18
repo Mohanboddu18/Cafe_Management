@@ -126,6 +126,11 @@ public class AdminController {
         return ResponseEntity.ok(tableQrService.getQrCodeByTableId(tableId));
     }
 
+    @PutMapping("/tables/{tableId}/status")
+    public ResponseEntity<RestaurantTable> updateTableStatus(@PathVariable Long tableId, @RequestParam String status) {
+        return ResponseEntity.ok(tableQrService.updateTableStatus(tableId, status));
+    }
+
     // --- EMPLOYEE MANAGEMENT ---
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {

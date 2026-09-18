@@ -558,23 +558,18 @@ export class MenuComponent implements OnInit {
         this.tableId = tbl.id;
         this.tableStatus = tbl.status;
 
-        // Auto-occupy table for guest when scanning QR code via Google Lens if AVAILABLE
-        if (tbl.status === 'AVAILABLE') {
-          this.customerService.occupyTable(tbl.id, this.sessionId, this.customerTokenSerial).subscribe({
-            next: (updatedTbl) => {
-              this.tableStatus = updatedTbl.status;
-              this.loadCart();
-              this.checkActiveOrder(updatedTbl);
-            },
-            error: () => {
-              this.loadCart();
-              this.checkActiveOrder(tbl);
-            }
-          });
-        } else {
-          this.loadCart();
-          this.checkActiveOrder(tbl);
-        }
+        // Auto-occupy table for guest when scanning QR code or accessing menu
+        this.customerService.occupyTable(tbl.id, this.sessionId, this.customerTokenSerial).subscribe({
+          next: (updatedTbl) => {
+            this.tableStatus = updatedTbl.status;
+            this.loadCart();
+            this.checkActiveOrder(updatedTbl);
+          },
+          error: () => {
+            this.loadCart();
+            this.checkActiveOrder(tbl);
+          }
+        });
       },
       error: () => {
         this.tableId = 1;
@@ -598,12 +593,6 @@ export class MenuComponent implements OnInit {
   }
 
   checkActiveOrder(currentTable?: RestaurantTable): void {
-    // Check if current guest owns this table's session or token link
-    const isMySessionOrToken = currentTable && (
-      currentTable.currentSessionId === this.sessionId ||
-      currentTable.currentTokenSerial === this.customerTokenSerial
-    );
-
     this.customerService.getActiveOrderByTable(this.tableId).subscribe({
       next: (order) => {
         if (order && (order.sessionId === this.sessionId || order.customerTokenSerial === this.customerTokenSerial)) {
@@ -611,24 +600,18 @@ export class MenuComponent implements OnInit {
           this.activeOrder = order;
           this.isTableOccupiedByOther = false;
         } else if (order) {
-          // Active order belongs to another guest!
+          // Active order belongs to another guest currently dining at this table!
           this.activeOrder = null;
           this.isTableOccupiedByOther = true;
-        } else if (this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') {
-          this.activeOrder = null;
-          this.isTableOccupiedByOther = !isMySessionOrToken;
         } else {
+          // No active dining order on this table!
           this.activeOrder = null;
           this.isTableOccupiedByOther = false;
         }
       },
       error: () => {
         this.activeOrder = null;
-        if (this.tableStatus === 'OCCUPIED' || this.tableStatus === 'BILL_REQUESTED') {
-          this.isTableOccupiedByOther = !isMySessionOrToken;
-        } else {
-          this.isTableOccupiedByOther = false;
-        }
+        this.isTableOccupiedByOther = false;
       }
     });
   }
