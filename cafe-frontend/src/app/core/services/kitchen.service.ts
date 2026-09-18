@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Order, NotificationMsg } from '../models/cafe.models';
+import { getBaseUrl } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KitchenService {
-  private apiUrl = 'http://localhost:8080/api/kitchen';
+  private apiUrl = `${getBaseUrl()}/api/kitchen`;
 
   constructor(private http: HttpClient) {}
 

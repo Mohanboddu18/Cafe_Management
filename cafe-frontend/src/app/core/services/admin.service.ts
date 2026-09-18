@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Category, MenuItem, RestaurantTable, Coupon, Inventory, StockHistory, DashboardSummary, User } from '../models/cafe.models';
+import { getBaseUrl } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost:8080/api/admin';
+  private apiUrl = `${getBaseUrl()}/api/admin`;
 
   constructor(private http: HttpClient) {}
 

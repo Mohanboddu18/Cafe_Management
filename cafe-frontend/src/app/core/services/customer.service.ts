@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Category, MenuItem, RestaurantTable, Cart, Order, Invoice } from '../models/cafe.models';
+import { getBaseUrl } from './api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'http://localhost:8080/api/customer';
+  private apiUrl = `${getBaseUrl()}/api/customer`;
 
   constructor(private http: HttpClient) {}
 
@@ -99,10 +100,10 @@ export class CustomerService {
   }
 
   submitReview(reviewData: any): Observable<any[]> {
-    return this.http.post<any[]>('http://localhost:8080/api/reviews/submit', reviewData);
+    return this.http.post<any[]>(`${getBaseUrl()}/api/reviews/submit`, reviewData);
   }
 
   getItemReviews(menuItemId: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/reviews/item/${menuItemId}`);
+    return this.http.get<any[]>(`${getBaseUrl()}/api/reviews/item/${menuItemId}`);
   }
 }

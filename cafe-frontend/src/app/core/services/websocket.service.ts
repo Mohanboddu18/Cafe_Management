@@ -3,6 +3,7 @@ import { Client } from '@stomp/stompjs';
 import * as SockJS_ from 'sockjs-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { NotificationMsg } from '../models/cafe.models';
+import { getBaseUrl } from './api.config';
 
 const SockJS = (SockJS_ as any).default || SockJS_;
 
@@ -21,7 +22,7 @@ export class WebSocketService {
   private initWebSocket(): void {
     try {
       this.stompClient = new Client({
-        webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+        webSocketFactory: () => new SockJS(`${getBaseUrl()}/ws`),
         reconnectDelay: 5000,
         debug: (str) => console.log('[STOMP]', str)
       });
